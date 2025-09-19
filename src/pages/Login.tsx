@@ -4,7 +4,7 @@ import { useEffect } from "react";
 
 const Login = () => {
   useEffect(() => {
-    (window as any).catalyst.auth.signIn("login");
+    (window as any).catalyst.auth.signIn("login", { redirect_url: "/" });
   }, []);
 
   return (
