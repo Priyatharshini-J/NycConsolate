@@ -1,0 +1,48 @@
+{
+  "defaults": {
+    "project": 2,
+    "env": 1
+  },
+  "actives": {
+    "project": 2,
+    "env": 1
+  },
+  "projects": [
+    {
+      "idx": 1,
+      "id": "12130000057872864",
+      "name": "tpirlagv-ussolution",
+      "domain": {
+        "id": "10105033479",
+        "name": "tpirlagv-ussolution-773793963.development"
+      },
+      "timezone": "Asia/Kolkata",
+      "env": [
+        {
+          "idx": 1,
+          "id": "773793963",
+          "name": "Development",
+          "type": 3
+        }
+      ]
+    },
+    {
+      "idx": 2,
+      "id": "12130000058041665",
+      "name": "NycConsolateApp",
+      "domain": {
+        "id": "10105529321",
+        "name": "nycconsolateapp-773793963.development"
+      },
+      "timezone": "Asia/Kolkata",
+      "env": [
+        {
+          "idx": 1,
+          "id": "773793963",
+          "name": "Development",
+          "type": 3
+        }
+      ]
+    }
+  ]
+}

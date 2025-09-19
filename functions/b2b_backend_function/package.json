@@ -1,0 +1,9 @@
+{
+	"name": "b2b_backend_function",
+	"version": "1.0.0",
+	"main": "index.js",
+	"author": "priyatharshini.ja+solutions@zohotest.com",
+	"dependencies": {
+		"zcatalyst-sdk-node": "beta"
+	}
+}

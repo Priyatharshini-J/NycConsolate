@@ -1,0 +1,15 @@
+{
+	"deployment": {
+		"name": "b2b_backend_function",
+		"stack": "node20",
+		"type": "advancedio",
+		"env_variables": {
+			"CLIENTID" : "1000.YAATF4OFRP92CM0KU95WM56VTHE2MT", 
+ 			"CLIENT_SECRET" : "a5d258aa14a90a04e3ac2848c7c3ed00a9f55742e6",
+			"REFRESH_TOKEN" : "1000.c8c19d4266243a25281fc2753d66d19c.c5b5e9040e0f08339e99d742d3b392ab"
+		}
+	},
+	"execution": {
+		"main": "index.js"
+	}
+}

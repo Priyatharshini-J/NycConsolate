@@ -1,0 +1,15 @@
+{
+  "slate": [
+    {
+      "name": "NycConsolate",
+      "source": "/Users/priya-8673/Documents/github/NycConsolate"
+    }
+  ],
+  "functions": {
+    "targets": [
+      "b2b_backend_function"
+    ],
+    "ignore": [],
+    "source": "functions"
+  }
+}
