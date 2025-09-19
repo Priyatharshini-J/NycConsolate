@@ -90,7 +90,8 @@ function App() {
             )}
 
             {isUserAuthenticated &&
-              currUser.role_details.role_name === "App User" && (
+              (currUser.role_details.role_name === "App User" ||
+                currUser.role_details.role_name === "Buyer") && (
                 <>
                   <Route
                     path="/"
@@ -148,15 +149,16 @@ function App() {
               )}
 
             {isUserAuthenticated &&
-              currUser.role_details.role_name === "App Administrator" && (
+              (currUser.role_details.role_name === "App Administrator" ||
+                currUser.role_details.role_name === "Seller") && (
                 <>
                   <Route
                     path="/"
-                    element={<Navigate to="/sellers" replace />}
+                    element={<Navigate to="/seller/upload-products" replace />}
                   />
                   <Route
                     path="/app"
-                    element={<Navigate to="/sellers" replace />}
+                    element={<Navigate to="/seller/upload-products" replace />}
                   />
 
                   {/* Seller Routes */}

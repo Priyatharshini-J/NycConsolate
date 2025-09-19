@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StarRating } from "@/components/common/StarRating";
-import { MapPin, Award, Users, Truck } from "lucide-react";
+import { MapPin, Award, Users, Truck, Handshake } from "lucide-react";
 
 interface Seller {
   id: string;
@@ -16,6 +16,7 @@ interface Seller {
   Years_in_Business: number;
   Employee_Count: number;
   certifications: string[];
+  Engagement_Score: number;
   // specialties: string[];
   // responseTime: string;
   // deliveryTime: string;
@@ -77,13 +78,12 @@ export function SellerCard({ seller, onContactSeller }: SellerCardProps) {
               {seller.Employee_Count} employees
             </span>
           </div>
-          {/* <div className="flex items-center gap-2">
-            <Truck className="h-4 w-4 text-professional-blue" />
-            <span className="text-muted-foreground">{seller.deliveryTime}</span>
-          </div> */}
-          {/* <div className="text-muted-foreground">
-            Response: {seller.responseTime}
-          </div> */}
+          <div className="flex items-center gap-2">
+            <Handshake className="h-4 w-4 text-professional-blue" />
+            <span className="text-muted-foreground">
+              {seller.Engagement_Score}
+            </span>
+          </div>
         </div>
 
         {/* Certifications */}

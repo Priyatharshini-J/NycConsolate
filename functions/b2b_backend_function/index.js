@@ -22,7 +22,7 @@ const corsOptions = {
 	credentials: true,
 };
 
-app.use(cors(corsOptions));
+// app.use(cors(corsOptions));
 
 app.get("/getBuyer/:id", async (req, res) => {
 	try {
@@ -95,7 +95,7 @@ app.get("/getSeller/:id", async (req, res) => {
 		const sellerAccountId = sellerData['Vendor_Account']['id']
 		const sellerAccountRawData = await axios.get(`https://www.zohoapis.com/crm/v8/Vendors/${sellerAccountId}`, {
 			params: {
-				fields: "Vendor_Name,Website,Business_Description,Years_in_Business,Employee_Count,Business_License_Number,Tax_Identification_Number"
+				fields: "Vendor_Name,Website,Business_Description,Years_in_Business,Employee_Count,Business_License_Number,Tax_Identification_Number,Engagement_Score"
 			},
 			headers: {
 				Authorization: `Zoho-oauthtoken ${accessToken}`
@@ -412,7 +412,7 @@ app.get("/getVendors", async (req, res) => {
 		const accessToken = await catalystApp.connection(credentials).getConnector('crm_connector').getAccessToken()
 		const vendors = await axios.get(`https://www.zohoapis.com/crm/v7/Vendors`, {
 			params: {
-				fields: "id,Vendor_Name,Business_Description,Average_Rating,Rating_Count,State,Country,Years_in_Business,Employee_Count,Vendor_Certifications"
+				fields: "id,Vendor_Name,Business_Description,Average_Rating,Rating_Count,State,Country,Years_in_Business,Employee_Count,Vendor_Certifications,Engagement_Score"
 			},
 			headers: {
 				Authorization: `Zoho-oauthtoken ${accessToken}`
@@ -1012,7 +1012,7 @@ app.get("/search/:type/:word", async (req, res) => {
 		if (productsRawData) {
 			const vendors = await axios.get(`https://www.zohoapis.com/crm/v7/Vendors`, {
 				params: {
-					fields: "id,Average_Rating,State,Country,Vendor_Certifications"
+					fields: "id,Average_Rating,State,Country,Vendor_Certifications,Engagement_Score"
 				},
 				headers: {
 					Authorization: `Zoho-oauthtoken ${accessToken}`
@@ -1086,7 +1086,7 @@ app.get("/searchRating/:rating", async (req, res) => {
 		const vendorsData = await axios.get(`https://www.zohoapis.com/crm/v8/Vendors/search`, {
 			params: {
 				criteria: `Average_Rating:starts_with:${rating}`,
-				fields: "id,Vendor_Name,Business_Description,Average_Rating,Rating_Count,State,Country,Years_in_Business,Employee_Count"
+				fields: "id,Vendor_Name,Business_Description,Average_Rating,Rating_Count,State,Country,Years_in_Business,Employee_Count,Engagement_Score"
 			},
 			headers: {
 				Authorization: `Zoho-oauthtoken ${accessToken}`
@@ -1167,7 +1167,7 @@ app.get("/searchSellers/:word", async (req, res) => {
 		const vendors = await axios.get(`https://www.zohoapis.com/crm/v8/Vendors/search`, {
 			params: {
 				word,
-				fields: "id,Vendor_Name,Business_Description,Average_Rating,Rating_Count,State,Country,Years_in_Business,Employee_Count,Vendor_Certifications"
+				fields: "id,Vendor_Name,Business_Description,Average_Rating,Rating_Count,State,Country,Years_in_Business,Employee_Count,Vendor_Certifications,Engagement_Score"
 			},
 			headers: {
 				Authorization: `Zoho-oauthtoken ${accessToken}`
@@ -1225,7 +1225,7 @@ app.get("/searchSellerRating/:rating", async (req, res) => {
 		const vendorsData = await axios.get(`https://www.zohoapis.com/crm/v8/Vendors/search`, {
 			params: {
 				criteria: `Average_Rating:starts_with:${rating}`,
-				fields: "id,Vendor_Name,Business_Description,Average_Rating,Rating_Count,State,Country,Years_in_Business,Employee_Count"
+				fields: "id,Vendor_Name,Business_Description,Average_Rating,Rating_Count,State,Country,Years_in_Business,Employee_Count,Engagement_Score"
 			},
 			headers: {
 				Authorization: `Zoho-oauthtoken ${accessToken}`
@@ -1297,7 +1297,7 @@ app.get("/searchSellerCertification/:certificate", async (req, res) => {
 		if (certificationsRawData) {
 			const vendorsData = await axios.get(`https://www.zohoapis.com/crm/v8/Vendors`, {
 				params: {
-					fields: "id,Vendor_Name,Business_Description,Average_Rating,Rating_Count,State,Country,Years_in_Business,Employee_Count"
+					fields: "id,Vendor_Name,Business_Description,Average_Rating,Rating_Count,State,Country,Years_in_Business,Employee_Count,Engagement_Score"
 				},
 				headers: {
 					Authorization: `Zoho-oauthtoken ${accessToken}`
