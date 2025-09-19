@@ -16,7 +16,6 @@ import ManageProducts from "./pages/seller/ManageProducts";
 import MyCertifications from "./pages/seller/MyCertifications";
 import SellerTransactions from "./pages/seller/SellerTransactions";
 import SellerProfile from "./pages/seller/SellerProfile";
-import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 import { useEffect, useState } from "react";
 import Login from "./pages/Login";
@@ -27,6 +26,7 @@ type currentUser = {
   user_id: number;
   first_name: string;
   last_name: string;
+  user_type: string;
 };
 
 function App() {
@@ -36,7 +36,9 @@ function App() {
     user_id: 0,
     first_name: "",
     last_name: "",
+    user_type: "",
   });
+
   useEffect(() => {
     const Zcatalyst = (window as any).catalyst;
     Zcatalyst.auth
@@ -58,6 +60,7 @@ function App() {
     const currentUserPromise = userManagement.getCurrentProjectUser();
     currentUserPromise
       .then((response: any) => {
+        console.log("user - ", response.content);
         setCurrUser(response.content);
       })
       .catch((err: any) => {
@@ -76,10 +79,22 @@ function App() {
         <Sonner />
         <BrowserRouter>
           <Routes>
-            {isUserAuthenticated ? (
+            {/* Redirect based on auth and user type */}
+            {!isUserAuthenticated && (
               <>
-                <Route path="/" element={<Index />} />
-                <Route path="/app" element={<Index />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="*" element={<Navigate to="/login" replace />} />
+              </>
+            )}
+
+            {isUserAuthenticated && currUser.user_type === "App User" && (
+              <>
+                <Route path="/" element={<Navigate to="/products" replace />} />
+                <Route
+                  path="/app"
+                  element={<Navigate to="/products" replace />}
+                />
+
                 {/* Buyer Routes */}
                 <Route
                   path="/products"
@@ -121,6 +136,19 @@ function App() {
                     </BuyerLayout>
                   }
                 />
+
+                <Route path="*" element={<NotFound />} />
+              </>
+            )}
+
+            {isUserAuthenticated && currUser.user_type === "App Admin" && (
+              <>
+                <Route path="/" element={<Navigate to="/sellers" replace />} />
+                <Route
+                  path="/app"
+                  element={<Navigate to="/sellers" replace />}
+                />
+
                 {/* Seller Routes */}
                 <Route
                   path="/seller/upload-products"
@@ -170,12 +198,8 @@ function App() {
                     </SellerLayout>
                   }
                 />
+
                 <Route path="*" element={<NotFound />} />
-              </>
-            ) : (
-              <>
-                <Route path="/login" element={<Login />} />
-                <Route path="*" element={<Navigate to="/login" replace />} />
               </>
             )}
           </Routes>

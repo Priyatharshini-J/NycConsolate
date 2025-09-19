@@ -17,7 +17,6 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const navigation = [
-  { name: "Home", href: "/", icon: Home },
   { name: "Upload My Products", href: "/seller/upload-products", icon: Upload },
   { name: "Modify My Products", href: "/seller/manage-products", icon: Edit },
   { name: "My Certifications", href: "/seller/certifications", icon: Award },
