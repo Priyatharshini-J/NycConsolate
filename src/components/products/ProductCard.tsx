@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StarRating } from "@/components/common/StarRating";
-import { MapPin, Package } from "lucide-react";
+import { Handshake, MapPin, Package } from "lucide-react";
 
 interface Product {
   id: string;
@@ -14,6 +14,7 @@ interface Product {
   sellerId: string;
   sellerName: string;
   sellerRating: number;
+  sellerEngScore: number;
   sellerLocation: string;
   Product_Category: string;
   certificates?: string[];
@@ -84,9 +85,15 @@ export function ProductCard({ product, onContactSeller }: ProductCardProps) {
               <p className="font-medium text-sm">{product.sellerName}</p>
               <StarRating rating={product.sellerRating} size="sm" />
             </div>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
-              <MapPin className="h-3 w-3" />
-              <span>{product.sellerLocation}</span>
+            <div className="flex items-center text-xs text-muted-foreground justify-between">
+              <div className="flex items-center gap-1">
+                <MapPin className="h-3 w-3" />
+                <span>{product.sellerLocation}</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <Handshake className="h-3 w-3" />
+                <span>{product.sellerEngScore}</span>
+              </div>
             </div>
           </div>
         </div>

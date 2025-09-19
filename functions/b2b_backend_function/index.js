@@ -296,7 +296,7 @@ app.get("/getProducts", async (req, res) => {
 
 		const vendors = await axios.get(`https://www.zohoapis.com/crm/v7/Vendors`, {
 			params: {
-				fields: "id,Average_Rating,State,Country,Vendor_Certifications"
+				fields: "id,Average_Rating,State,Country,Vendor_Certifications,Engagement_Score"
 			},
 			headers: {
 				Authorization: `Zoho-oauthtoken ${accessToken}`
@@ -336,7 +336,8 @@ app.get("/getProducts", async (req, res) => {
 				sellerName: product.Vendor_Name.name,
 				sellerLocation: (vendorData.State ? vendorData.State : "") + (vendorData.Country ? ", " + vendorData.Country : ""),
 				sellerRating: vendorData.Average_Rating,
-				certificates: vendorCertificates
+				certificates: vendorCertificates,
+				sellerEngScore: vendorData.Engagement_Score
 			};
 		});
 		res.status(200).json(mergedProducts);
@@ -1052,7 +1053,8 @@ app.get("/search/:type/:word", async (req, res) => {
 					sellerName: product.Vendor_Name.name,
 					sellerLocation: (vendorData.State ? vendorData.State : "") + (vendorData.Country ? ", " + vendorData.Country : ""),
 					sellerRating: vendorData.Average_Rating,
-					certificates: vendorCertificates
+					certificates: vendorCertificates,
+					sellerEngScore: vendorData.Engagement_Score
 				};
 			});
 			res.status(200).json(mergedProducts);
@@ -1127,7 +1129,8 @@ app.get("/searchRating/:rating", async (req, res) => {
 							sellerName: prod.Vendor_Name.name,
 							sellerLocation: (vendor.State ? vendor.State : "") + (vendor.Country ? ", " + vendor.Country : ""),
 							sellerRating: vendor.Average_Rating,
-							certificates: vendorCertificates
+							certificates: vendorCertificates,
+							sellerEngScore: vendor.Engagement_Score
 						};
 
 					});
