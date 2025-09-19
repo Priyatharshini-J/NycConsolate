@@ -46,9 +46,7 @@ const NotFound = () => {
         <p className="mb-4 text-xl text-gray-600">Oops! Page not found</p>
         <a
           href={
-            currUser.user_type === ""
-              ? "/login"
-              : currUser.user_type === "App User"
+            currUser.user_type === "App User"
               ? "/products"
               : currUser.user_type === "App Admin"
               ? "/sellers"
