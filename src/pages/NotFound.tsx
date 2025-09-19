@@ -7,6 +7,7 @@ type currentUser = {
   first_name: string;
   last_name: string;
   user_type: string;
+  role_details: { role_name: string; role_id: string };
 };
 
 const NotFound = () => {
@@ -16,6 +17,7 @@ const NotFound = () => {
     first_name: "",
     last_name: "",
     user_type: "",
+    role_details: { role_name: "", role_id: "" },
   });
 
   useEffect(() => {
@@ -46,9 +48,9 @@ const NotFound = () => {
         <p className="mb-4 text-xl text-gray-600">Oops! Page not found</p>
         <a
           href={
-            currUser.user_type === "App User"
+            currUser.role_details.role_name === "App User"
               ? "/products"
-              : currUser.user_type === "App Admin"
+              : currUser.role_details.role_name === "App Admin"
               ? "/sellers"
               : "/" // fallback if needed
           }

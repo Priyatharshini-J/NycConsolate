@@ -27,6 +27,7 @@ type currentUser = {
   first_name: string;
   last_name: string;
   user_type: string;
+  role_details: { role_name: string; role_id: string };
 };
 
 function App() {
@@ -37,6 +38,7 @@ function App() {
     first_name: "",
     last_name: "",
     user_type: "",
+    role_details: { role_name: "", role_id: "" },
   });
 
   useEffect(() => {
@@ -87,121 +89,129 @@ function App() {
               </>
             )}
 
-            {isUserAuthenticated && currUser.user_type === "App User" && (
-              <>
-                <Route path="/" element={<Navigate to="/products" replace />} />
-                <Route
-                  path="/app"
-                  element={<Navigate to="/products" replace />}
-                />
+            {isUserAuthenticated &&
+              currUser.role_details.role_name === "App User" && (
+                <>
+                  <Route
+                    path="/"
+                    element={<Navigate to="/products" replace />}
+                  />
+                  <Route
+                    path="/app"
+                    element={<Navigate to="/products" replace />}
+                  />
 
-                {/* Buyer Routes */}
-                <Route
-                  path="/products"
-                  element={
-                    <BuyerLayout>
-                      <ProductSearch />
-                    </BuyerLayout>
-                  }
-                />
-                <Route
-                  path="/sellers"
-                  element={
-                    <BuyerLayout>
-                      <SellerSearch />
-                    </BuyerLayout>
-                  }
-                />
-                <Route
-                  path="/transactions"
-                  element={
-                    <BuyerLayout>
-                      <Transactions />
-                    </BuyerLayout>
-                  }
-                />
-                <Route
-                  path="/profile"
-                  element={
-                    <BuyerLayout>
-                      <AccountProfile />
-                    </BuyerLayout>
-                  }
-                />
-                <Route
-                  path="/password"
-                  element={
-                    <BuyerLayout>
-                      <ChangePassword />
-                    </BuyerLayout>
-                  }
-                />
+                  {/* Buyer Routes */}
+                  <Route
+                    path="/products"
+                    element={
+                      <BuyerLayout>
+                        <ProductSearch />
+                      </BuyerLayout>
+                    }
+                  />
+                  <Route
+                    path="/sellers"
+                    element={
+                      <BuyerLayout>
+                        <SellerSearch />
+                      </BuyerLayout>
+                    }
+                  />
+                  <Route
+                    path="/transactions"
+                    element={
+                      <BuyerLayout>
+                        <Transactions />
+                      </BuyerLayout>
+                    }
+                  />
+                  <Route
+                    path="/profile"
+                    element={
+                      <BuyerLayout>
+                        <AccountProfile />
+                      </BuyerLayout>
+                    }
+                  />
+                  <Route
+                    path="/password"
+                    element={
+                      <BuyerLayout>
+                        <ChangePassword />
+                      </BuyerLayout>
+                    }
+                  />
 
-                <Route path="*" element={<NotFound />} />
-              </>
-            )}
+                  <Route path="*" element={<NotFound />} />
+                </>
+              )}
 
-            {isUserAuthenticated && currUser.user_type === "App Admin" && (
-              <>
-                <Route path="/" element={<Navigate to="/sellers" replace />} />
-                <Route
-                  path="/app"
-                  element={<Navigate to="/sellers" replace />}
-                />
+            {isUserAuthenticated &&
+              currUser.role_details.role_name === "App Administrator" && (
+                <>
+                  <Route
+                    path="/"
+                    element={<Navigate to="/sellers" replace />}
+                  />
+                  <Route
+                    path="/app"
+                    element={<Navigate to="/sellers" replace />}
+                  />
 
-                {/* Seller Routes */}
-                <Route
-                  path="/seller/upload-products"
-                  element={
-                    <SellerLayout>
-                      <UploadProducts />
-                    </SellerLayout>
-                  }
-                />
-                <Route
-                  path="/seller/manage-products"
-                  element={
-                    <SellerLayout>
-                      <ManageProducts />
-                    </SellerLayout>
-                  }
-                />
-                <Route
-                  path="/seller/certifications"
-                  element={
-                    <SellerLayout>
-                      <MyCertifications />
-                    </SellerLayout>
-                  }
-                />
-                <Route
-                  path="/seller/transactions"
-                  element={
-                    <SellerLayout>
-                      <SellerTransactions />
-                    </SellerLayout>
-                  }
-                />
-                <Route
-                  path="/seller/profile"
-                  element={
-                    <SellerLayout>
-                      <SellerProfile />
-                    </SellerLayout>
-                  }
-                />
-                <Route
-                  path="/seller/password"
-                  element={
-                    <SellerLayout>
-                      <ChangePassword />
-                    </SellerLayout>
-                  }
-                />
+                  {/* Seller Routes */}
+                  <Route
+                    path="/seller/upload-products"
+                    element={
+                      <SellerLayout>
+                        <UploadProducts />
+                      </SellerLayout>
+                    }
+                  />
+                  <Route
+                    path="/seller/manage-products"
+                    element={
+                      <SellerLayout>
+                        <ManageProducts />
+                      </SellerLayout>
+                    }
+                  />
+                  <Route
+                    path="/seller/certifications"
+                    element={
+                      <SellerLayout>
+                        <MyCertifications />
+                      </SellerLayout>
+                    }
+                  />
+                  <Route
+                    path="/seller/transactions"
+                    element={
+                      <SellerLayout>
+                        <SellerTransactions />
+                      </SellerLayout>
+                    }
+                  />
+                  <Route
+                    path="/seller/profile"
+                    element={
+                      <SellerLayout>
+                        <SellerProfile />
+                      </SellerLayout>
+                    }
+                  />
+                  <Route
+                    path="/seller/password"
+                    element={
+                      <SellerLayout>
+                        <ChangePassword />
+                      </SellerLayout>
+                    }
+                  />
 
-                <Route path="*" element={<NotFound />} />
-              </>
-            )}
+                  <Route path="*" element={<NotFound />} />
+                </>
+              )}
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
