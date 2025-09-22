@@ -55,7 +55,7 @@ export default function ProductSearch() {
           name: `${productName}_${Date.now()}`,
           productId,
           sellerId,
-          closingDate: formatDate(new Date()),
+          initiatedDate: formatDate(new Date()),
         }
       );
       if (response.data.code === "SUCCESS") {

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -40,6 +41,12 @@ interface Product {
 export default function ManageProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const navigate = useNavigate();
+
+  const handleAddProductClick = () => {
+    navigate("/seller/upload-products");
+  };
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -232,19 +239,37 @@ export default function ManageProducts() {
       ) : (
         <div className="space-y-6">
           {/* Header */}
-          <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">
-              Modify My Products
-            </h1>
-            <p className="text-muted-foreground">
-              Update and manage your existing product catalog
-            </p>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-foreground mb-2">
+                Modify My Products
+              </h1>
+              <p className="text-muted-foreground">
+                Update and manage your existing product catalog
+              </p>
+            </div>
+            <button
+              className="flex items-center gap-1 bg-[#099ed9] text-white text-sm font-medium rounded-lg px-6 py-3 shadow hover:bg-[#088cc0] transition"
+              onClick={handleAddProductClick}
+            >
+              <svg
+                width="16"
+                height="16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                className="mr-2"
+              >
+                <path d="M10 4v12m6-6H4" />
+              </svg>
+              Add products
+            </button>
           </div>
 
           {/* Products Grid */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">Your Products</h2>
+              <h2 className="text-xl font-semibold">My Products</h2>
               <p className="text-sm text-muted-foreground">
                 {products.length} products in catalog
               </p>

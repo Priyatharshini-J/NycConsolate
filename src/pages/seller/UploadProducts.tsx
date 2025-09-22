@@ -352,7 +352,7 @@ export default function UploadProducts() {
                           Agricultural Products
                         </SelectItem>
                         <SelectItem value="Electronice and Technology">
-                          Electronics and Technology
+                          Electronics & Technology
                         </SelectItem>
                         <SelectItem value="Jewelry & Luxury Goods">
                           Jewelry & Luxury Goods

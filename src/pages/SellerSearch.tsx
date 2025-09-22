@@ -50,7 +50,7 @@ export default function SellerSearch() {
           buyerAccountId,
           name: `${sellerName}_${Date.now()}`,
           sellerId,
-          closingDate: formatDate(new Date()),
+          initiatedDate: formatDate(new Date()),
         }
       );
       if (response.data.code === "SUCCESS") {

@@ -293,9 +293,15 @@ export default function Transactions() {
                           Closing Date
                         </p>
                         <div className="flex items-center gap-1">
-                          <Calendar className="h-3 w-3" />
+                          {deal.Closing_Date ? (
+                            <Calendar className="h-3 w-3" />
+                          ) : (
+                            ""
+                          )}
                           <span>
-                            {new Date(deal.Closing_Date).toLocaleDateString()}
+                            {deal.Closing_Date
+                              ? new Date(deal.Closing_Date).toLocaleDateString()
+                              : "In Negotiation"}
                           </span>
                         </div>
                       </div>

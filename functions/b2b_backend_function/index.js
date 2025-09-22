@@ -699,7 +699,7 @@ app.get("/getSellerDeals/:id", async (req, res) => {
 
 app.post("/postDeal", async (req, res) => {
 	try {
-		const { buyerAccountId, name, productId, sellerId, closingDate } = req.body;
+		const { buyerAccountId, name, productId, sellerId, initiatedDate } = req.body;
 		const catalystApp = catalyst.initialize(req);
 		const credentials = {
 			crm_connector: {
@@ -714,7 +714,7 @@ app.post("/postDeal", async (req, res) => {
 			Account_Name: { id: buyerAccountId },
 			Deal_Name: name,
 			Vendor_Name: { id: sellerId },
-			Closing_Date: closingDate,
+			Deal_Initiated_Date: initiatedDate,
 			Stage: "Seller Contacted",
 			Quantity: 0
 		};
@@ -753,10 +753,20 @@ app.put("/deal/:id", async (req, res) => {
 			constructedData = {
 				data: [{
 					id: req.params.id,
-					Stage: stage
+					Stage: stage,
 				}]
 			};
-		} else if (quantity !== undefined && quantity !== null) {
+		} else if (stage !== undefined && stage !== null && stage.toLowerCase().includes("closed")
+		) {
+			constructedData = {
+				data: [{
+					id: req.params.id,
+					Stage: stage,
+					Closing_Date: formatDate(new Date())
+				}]
+			};
+		}
+		else if (quantity !== undefined && quantity !== null) {
 			constructedData = {
 				data: [{
 					id: req.params.id,
@@ -1343,6 +1353,15 @@ app.get("/searchSellerCertification/:certificate", async (req, res) => {
 		});
 	}
 });
+
+
+const formatDate = (date) => {
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
+	const day = String(date.getDate()).padStart(2, "0");
+
+	return `${year}-${month}-${day}`;
+};
 
 
 
