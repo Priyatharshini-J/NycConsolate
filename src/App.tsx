@@ -154,11 +154,11 @@ function App() {
                 <>
                   <Route
                     path="/"
-                    element={<Navigate to="/seller/upload-products" replace />}
+                    element={<Navigate to="/seller/manage-products" replace />}
                   />
                   <Route
                     path="/app"
-                    element={<Navigate to="/seller/upload-products" replace />}
+                    element={<Navigate to="/seller/manage-products" replace />}
                   />
 
                   {/* Seller Routes */}
