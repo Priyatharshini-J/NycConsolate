@@ -4,6 +4,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import {
   Home,
   Upload,
+  Search,
   Edit,
   Award,
   Receipt,
@@ -17,8 +18,8 @@ import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 const navigation = [
-  // { name: "Upload My Products", href: "/seller/upload-products", icon: Upload },
   { name: "My Products", href: "/seller/manage-products", icon: Edit },
+  { name: "Buyers Search", href: "/seller/buyers", icon: Search },
   { name: "My Certifications", href: "/seller/certifications", icon: Award },
   { name: "My Transactions", href: "/seller/transactions", icon: Receipt },
   { name: "Account Profile", href: "/seller/profile", icon: User },

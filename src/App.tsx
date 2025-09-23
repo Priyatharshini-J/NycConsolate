@@ -19,6 +19,7 @@ import SellerProfile from "./pages/seller/SellerProfile";
 import NotFound from "./pages/NotFound";
 import { useEffect, useState } from "react";
 import Login from "./pages/Login";
+import BuyerSearch from "./pages/seller/BuyerSearch";
 
 const queryClient = new QueryClient();
 
@@ -175,6 +176,14 @@ function App() {
                     element={
                       <SellerLayout>
                         <ManageProducts />
+                      </SellerLayout>
+                    }
+                  />
+                  <Route
+                    path="/seller/buyers"
+                    element={
+                      <SellerLayout>
+                        <BuyerSearch />
                       </SellerLayout>
                     }
                   />

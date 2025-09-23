@@ -453,6 +453,40 @@ app.get("/getVendors", async (req, res) => {
 	}
 });
 
+app.get("/getBuyers", async (req, res) => {
+	try {
+		const catalystApp = catalyst.initialize(req);
+		const credentials = {
+			crm_connector: {
+				client_id: CLIENTID,
+				client_secret: CLIENT_SECRET,
+				auth_url: AUTH_HOST,
+				refresh_url: AUTH_HOST,
+				refresh_token: REFRESH_TOKEN
+			}
+		}
+
+		const accessToken = await catalystApp.connection(credentials).getConnector('crm_connector').getAccessToken()
+		const buyers = await axios.get(`https://www.zohoapis.com/crm/v8/Accounts`, {
+			params: {
+				fields: "id,Account_Name,Business_Description,Billing_State,Billing_Country,No_of_Employees,Business_License_Number,Tax_Identification_Number,Primary_Contact,Account_Status,Website"
+			},
+			headers: {
+				Authorization: `Zoho-oauthtoken ${accessToken}`
+			}
+
+		});
+		const buyersRawData = buyers.data.data;
+		res.status(200).json(buyersRawData);
+	} catch (err) {
+		console.log("Error in GET Buyers >>> " + err);
+		res.status(500).send({
+			message: "Internal Server Error. Please try again after sometime.",
+			error: err
+		});
+	}
+});
+
 app.get("/getBuyerDeals/:id", async (req, res) => {
 	try {
 		const buyerID = req.params.id;
@@ -535,7 +569,7 @@ app.get("/getSellerCertifications/:id", async (req, res) => {
 		const accessToken = await catalystApp.connection(credentials).getConnector('crm_connector').getAccessToken()
 		const sellerCertifications = await axios.get(`https://www.zohoapis.com/crm/v8/Certifications/search?criteria=Vendor:equals:${SellerID}`, {
 			params: {
-				fields: "id,Certification_number,Name,Issued_Date,Expiry_Date,Issuer"
+				fields: "id,Certification_number,Name,Issued_Date,Expiry_Date,Issuer,Certifical_URl"
 			},
 			headers: {
 				Authorization: `Zoho-oauthtoken ${accessToken}`
@@ -555,7 +589,7 @@ app.get("/getSellerCertifications/:id", async (req, res) => {
 app.post("/postSellerCertifications/:id", async (req, res) => {
 	try {
 		const catalystApp = catalyst.initialize(req);
-		const { certificationNo, name, issuer, issueDate, expiryDate } = req.body;
+		const { certificationNo, name, issuer, issueDate, expiryDate, imageUrl } = req.body;
 		const payload = {
 			"data": [{
 				Name: name,
@@ -563,7 +597,8 @@ app.post("/postSellerCertifications/:id", async (req, res) => {
 				Issuer: issuer,
 				Issued_Date: issueDate,
 				Expiry_Date: expiryDate,
-				Vendor: { "id": req.params.id }
+				Vendor: { "id": req.params.id },
+				Certifical_URl: imageUrl
 			}]
 		}
 		const credentials = {
@@ -1211,6 +1246,41 @@ app.get("/searchSellers/:word", async (req, res) => {
 		}));
 
 		res.status(200).json(mergedVendors);
+
+	} catch (err) {
+		console.log("Error in GET buyerDetails >>> " + err);
+		res.status(500).send({
+			message: "Internal Server Error. Please try again after sometime.",
+			error: err
+		});
+	}
+});
+
+app.get("/searchBuyers/:word", async (req, res) => {
+	try {
+		const word = req.params.word;
+		const catalystApp = catalyst.initialize(req);
+		const credentials = {
+			crm_connector: {
+				client_id: CLIENTID,
+				client_secret: CLIENT_SECRET,
+				auth_url: AUTH_HOST,
+				refresh_url: AUTH_HOST,
+				refresh_token: REFRESH_TOKEN
+			}
+		}
+		const accessToken = await catalystApp.connection(credentials).getConnector('crm_connector').getAccessToken()
+		const buyers = await axios.get(`https://www.zohoapis.com/crm/v8/Accounts/search`, {
+			params: {
+				word,
+				fields: "id,Account_Name,Business_Description,Billing_State,Billing_Country,No_of_Employees,Business_License_Number,Tax_Identification_Number,Primary_Contact,Account_Status,Website"
+			},
+			headers: {
+				Authorization: `Zoho-oauthtoken ${accessToken}`
+			}
+		});
+		const buyersRawData = buyers.data.data;
+		res.status(200).json(buyersRawData);
 
 	} catch (err) {
 		console.log("Error in GET buyerDetails >>> " + err);

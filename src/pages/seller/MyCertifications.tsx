@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -20,10 +21,16 @@ import {
   Calendar,
   FileText,
   AlertCircle,
+  ImagePlus,
 } from "lucide-react";
 import { format } from "date-fns";
 import axios from "axios";
-import { BASE_URL, sellerAccountId } from "../../constants";
+import {
+  BASE_URL,
+  CERTIFICATES_BUCKET_NAME,
+  CERTIFICATES_BUCKET_URL,
+  sellerAccountId,
+} from "../../constants";
 
 interface Certification {
   id: string;
@@ -32,12 +39,26 @@ interface Certification {
   Issued_Date: string;
   Expiry_Date: string;
   Issuer: string;
+  Certifical_URl: string;
 }
 
 export default function MyCertifications() {
   const [certifications, setCertifications] = useState<Certification[]>([]);
   const [reloadCertsFlag, setReloadCertsFlag] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [imagePreview, setImagePreview] = useState<string>("");
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData((prev) => ({ ...prev, image: file }));
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   useEffect(() => {
     const fetchCertificates = async () => {
@@ -64,6 +85,7 @@ export default function MyCertifications() {
     issueDate: "",
     expiryDate: "",
     issuer: "",
+    image: null as File | null,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const { toast } = useToast();
@@ -135,9 +157,22 @@ export default function MyCertifications() {
       Issued_Date: "",
       Expiry_Date: "",
       Issuer: "",
+      Certifical_URl: "",
     };
 
     setCertifications((prev) => [newCert, ...prev]);
+
+    const stratus = (window as any).catalyst.stratus;
+    const bucket = stratus.bucket(CERTIFICATES_BUCKET_NAME);
+    const ms = Date.now();
+    const putObject = await bucket.putObject(
+      formData.certificateName + "_" + ms,
+      formData.image
+    );
+    putObject.start();
+    putObject.abort();
+    const fileUrl =
+      CERTIFICATES_BUCKET_URL + "/" + formData.certificateName + "_" + ms;
 
     try {
       // Send product data to backend to store in ZOHO CRM Product's module
@@ -149,6 +184,7 @@ export default function MyCertifications() {
           issuer: formData.issuer,
           issueDate: formData.issueDate,
           expiryDate: formData.expiryDate,
+          imageUrl: fileUrl,
         }
       );
       if (response.data.code === "SUCCESS") {
@@ -266,6 +302,7 @@ export default function MyCertifications() {
       issueDate: cert.Issued_Date,
       expiryDate: cert.Expiry_Date,
       issuer: cert.Issuer,
+      image: null,
     });
     setErrors({});
   };
@@ -277,7 +314,9 @@ export default function MyCertifications() {
       issueDate: "",
       expiryDate: "",
       issuer: "",
+      image: null,
     });
+    setImagePreview("");
     setErrors({});
   };
 
@@ -319,6 +358,42 @@ export default function MyCertifications() {
                 <DialogHeader>
                   <DialogTitle>Add New Certification</DialogTitle>
                 </DialogHeader>
+                <div>
+                  <Label htmlFor="image">Product Image</Label>
+                  <div className="mt-2">
+                    <div className="flex items-center gap-4">
+                      <div className="w-32 h-32 border-2 border-dashed border-border rounded-lg flex items-center justify-center bg-muted/50">
+                        {imagePreview ? (
+                          <img
+                            src={imagePreview}
+                            alt="Preview"
+                            className="w-full h-full object-cover rounded-lg"
+                          />
+                        ) : (
+                          <div className="text-center">
+                            <ImagePlus className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                            <p className="text-sm text-muted-foreground">
+                              Upload Image
+                            </p>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <Input
+                          id="image"
+                          type="file"
+                          accept="image/*"
+                          onChange={handleImageChange}
+                          className="cursor-pointer"
+                        />
+                        <p className="text-sm text-muted-foreground mt-1">
+                          Upload a high-quality product image (JPG, PNG, max
+                          5MB)
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
                 <div className="space-y-4">
                   <div>
                     <Label htmlFor="cert-number">Certificate Number *</Label>
@@ -443,9 +518,27 @@ export default function MyCertifications() {
                 <CardHeader className="pb-4">
                   <div className="flex items-start justify-between">
                     <div className="flex items-start gap-3">
-                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-professional-teal to-professional-success flex items-center justify-center">
-                        <Award className="h-6 w-6 text-white" />
+                      <div className="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center bg-white">
+                        {cert.Certifical_URl ? (
+                          <a
+                            href={cert.Certifical_URl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            tabIndex={-1}
+                          >
+                            <img
+                              src={cert.Certifical_URl}
+                              alt="Certificate"
+                              className="object-cover w-full h-full rounded-lg cursor-pointer"
+                            />
+                          </a>
+                        ) : (
+                          <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-professional-teal to-professional-success flex items-center justify-center overflow-hidden">
+                            <Award className="h-6 w-6 text-white" />
+                          </div>
+                        )}
                       </div>
+
                       <div>
                         <CardTitle className="text-lg line-clamp-1">
                           {cert.Name}
