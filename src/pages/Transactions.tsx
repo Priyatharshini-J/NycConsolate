@@ -269,7 +269,7 @@ export default function Transactions() {
                         <p className="font-medium text-muted-foreground">
                           Seller
                         </p>
-                        <p>{deal.Vendor_Name.name}</p>
+                        <p>{deal.Vendor_Name?.name || "NA"}</p>
                       </div>
                       <div>
                         <p className="font-medium text-muted-foreground">

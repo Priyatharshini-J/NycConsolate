@@ -227,7 +227,7 @@ export default function BuyerSearch() {
           {/* Results */}
           <div>
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-semibold">Seller Results</h2>
+              <h2 className="text-xl font-semibold">Buyer Results</h2>
               <p className="text-sm text-muted-foreground">
                 {buyers.length} sellers found
               </p>
