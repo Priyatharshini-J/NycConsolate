@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SellerCard } from "@/components/sellers/SellerCard";
-import { useToast } from "@/hooks/use-toast";
+import { useOverlayToast } from "@/hooks/use-overlay-toast";
 import axios from "axios";
 import { BASE_URL, buyerAccountId } from "../../constants";
 import { BuyerCard } from "@/components/buyers/BuyerCard";
@@ -22,7 +22,7 @@ export default function BuyerSearch() {
   //   const [ratingFilter, setRatingFilter] = useState("");
   const [buyers, setBuyers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const { showToast, overlayVisible } = useOverlayToast();
 
   const fetchBuyers = async () => {
     try {
@@ -129,6 +129,9 @@ export default function BuyerSearch() {
 
   return (
     <>
+      {overlayVisible && (
+        <div className="fixed inset-0 bg-black/50 z-[50]" aria-hidden />
+      )}
       {loading ? (
         <p className="loading">Loading ....</p>
       ) : (

@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
+import { useOverlayToast } from "@/hooks/use-overlay-toast";
 import {
   Building,
   Globe,
@@ -100,7 +100,7 @@ export default function SellerProfile() {
     }
   }, [profile]);
 
-  const { toast } = useToast();
+  const { showToast, overlayVisible } = useOverlayToast();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -130,12 +130,12 @@ export default function SellerProfile() {
         }
       );
       if (response.data.code === "SUCCESS") {
-        toast({
+        showToast({
           title: "Profile Updated",
           description: "Your seller profile has been successfully updated.",
         });
       } else {
-        toast({
+        showToast({
           title: "Profile Update Failed",
           description:
             "Your seller profile has not been updated. Please try again later",
@@ -148,6 +148,9 @@ export default function SellerProfile() {
 
   return (
     <>
+      {overlayVisible && (
+        <div className="fixed inset-0 bg-black/50 z-[50]" aria-hidden />
+      )}
       {loading ? (
         <p className="loading">Loading ....</p>
       ) : (

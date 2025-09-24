@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { StarRating } from "@/components/common/StarRating";
-import { useToast } from "@/hooks/use-toast";
+import { useOverlayToast } from "@/hooks/use-overlay-toast";
 import {
   Calendar,
   MessageCircle,
@@ -40,7 +40,7 @@ export default function Transactions() {
   const [rating, setRating] = useState(0);
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const { showToast, overlayVisible } = useOverlayToast();
 
   useEffect(() => {
     const fetchSellers = async () => {
@@ -95,10 +95,9 @@ export default function Transactions() {
 
   const handleSubmitFeedback = async (dealId: string, vendorId: string) => {
     if (!feedback.trim() || rating === 0) {
-      toast({
+      showToast({
         title: "Missing Information",
         description: "Please provide both feedback and rating.",
-        variant: "destructive",
       });
       return;
     }
@@ -115,20 +114,20 @@ export default function Transactions() {
       );
 
       if (res.data.code === "SUCCESS") {
-        toast({
+        showToast({
           title: "Feedback Submitted",
           description:
             "Thank you for your feedback. It helps improve our marketplace.",
         });
       } else {
-        toast({
+        showToast({
           title: "Feedback Submission failed",
           description: "Feedback submission failed. Please try again sometime.",
         });
       }
     } catch (err) {
       console.error("Failed to post feedback", err);
-      toast({
+      showToast({
         title: "Feedback Submission failed",
         description: "Feedback submission failed. Please try again sometime.",
       });
@@ -141,6 +140,9 @@ export default function Transactions() {
 
   return (
     <>
+      {overlayVisible && (
+        <div className="fixed inset-0 bg-black/50 z-[50]" aria-hidden />
+      )}
       {loading ? (
         <p className="loading">Loading ....</p>
       ) : (

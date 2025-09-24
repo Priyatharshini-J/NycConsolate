@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { SellerCard } from "@/components/sellers/SellerCard";
-import { useToast } from "@/hooks/use-toast";
+import { useOverlayToast } from "@/hooks/use-overlay-toast";
 import axios from "axios";
 import { BASE_URL, buyerAccountId } from "../constants";
 
@@ -21,7 +21,7 @@ export default function SellerSearch() {
   const [ratingFilter, setRatingFilter] = useState("");
   const [sellers, setSellers] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const { showToast, overlayVisible } = useOverlayToast();
 
   const fetchSellers = async () => {
     try {
@@ -54,12 +54,12 @@ export default function SellerSearch() {
         }
       );
       if (response.data.code === "SUCCESS") {
-        toast({
+        showToast({
           title: "Contact Request Sent",
           description: `Your contact request has been sent to ${sellerName}. A deal record has been created in your transactions.`,
         });
       } else {
-        toast({
+        showToast({
           title: "Contact Request Failed",
           description: `Your contact request has failed. Try again after sometime.`,
         });
@@ -67,7 +67,7 @@ export default function SellerSearch() {
     } catch (error) {
       console.error("Error in Creating a product deal:", error);
     }
-    toast({
+    showToast({
       title: "Contact Request Sent",
       description: `Your contact request has been sent to ${sellerName}. A deal record has been created in your transactions.`,
     });
@@ -125,6 +125,9 @@ export default function SellerSearch() {
 
   return (
     <>
+      {overlayVisible && (
+        <div className="fixed inset-0 bg-black/50 z-[50]" aria-hidden />
+      )}
       {loading ? (
         <p className="loading">Loading ....</p>
       ) : (
@@ -146,7 +149,7 @@ export default function SellerSearch() {
               <div className="flex-1 relative">
                 <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
                 <Input
-                  placeholder="Search by product category, seller name, or specialty..."
+                  placeholder="Search by vendor company, business description, or certificates..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
                   className="pl-10"

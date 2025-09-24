@@ -2,7 +2,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { StarRating } from "@/components/common/StarRating";
-import { MapPin, Award, Users, Truck, Handshake } from "lucide-react";
+import {
+  MapPin,
+  Award,
+  Users,
+  Truck,
+  Handshake,
+  Mail,
+  Phone,
+  User,
+  PhoneCall,
+} from "lucide-react";
 
 interface Seller {
   id: string;
@@ -17,9 +27,10 @@ interface Seller {
   Employee_Count: number;
   certifications: string[];
   Engagement_Score: number;
-  // specialties: string[];
-  // responseTime: string;
-  // deliveryTime: string;
+  First_Name: string;
+  Last_Name: string;
+  Email: string;
+  Mobile: string;
 }
 
 interface SellerCardProps {
@@ -33,13 +44,6 @@ export function SellerCard({ seller, onContactSeller }: SellerCardProps) {
       <CardContent className="p-6">
         {/* Seller Header */}
         <div className="flex items-start gap-4 mb-4">
-          {/* <div className="w-16 h-16 rounded-lg bg-muted flex items-center justify-center overflow-hidden border">
-            <img
-              src={seller.logo}
-              alt={seller.name}
-              className="w-full h-full object-cover"
-            />
-          </div> */}
           <div className="flex-1 min-w-0">
             <h3 className="font-semibold text-lg truncate">
               {seller.Vendor_Name}
@@ -55,6 +59,39 @@ export function SellerCard({ seller, onContactSeller }: SellerCardProps) {
               <span>
                 {seller.State},{seller.Country}
               </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Contact Info Section */}
+
+        <div className="mb-4 p-4 bg-muted rounded-md text-sm text-muted-foreground space-y-2">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4 text-primary" />
+              <span>
+                {seller.First_Name} {seller.Last_Name}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Mail className="w-4 h-4 text-primary" />
+              <a
+                href={`mailto:${seller.Email}`}
+                className="underline hover:text-primary"
+              >
+                {seller.Email}
+              </a>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <PhoneCall className="w-4 h-4 text-primary" />
+              <a
+                href={`tel:${seller.Mobile}`}
+                className="underline hover:text-primary"
+              >
+                {seller.Mobile}
+              </a>
             </div>
           </div>
         </div>
@@ -106,25 +143,6 @@ export function SellerCard({ seller, onContactSeller }: SellerCardProps) {
             </div>
           </div>
         )}
-
-        {/* Specialties */}
-        {/* <div>
-          <p className="text-xs font-medium text-muted-foreground mb-2">
-            Specialties
-          </p>
-          <div className="flex flex-wrap gap-1">
-            {seller.specialties.slice(0, 3).map((specialty, index) => (
-              <Badge key={index} variant="outline" className="text-xs">
-                {specialty}
-              </Badge>
-            ))}
-             {seller.specialties.length > 3 && (
-              <Badge variant="outline" className="text-xs">
-                +{seller.specialties.length - 3} more
-              </Badge>
-            )}
-          </div>
-        </div> */}
       </CardContent>
 
       <CardFooter className="p-6 pt-0">

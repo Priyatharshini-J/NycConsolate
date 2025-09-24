@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { useOverlayToast } from "@/hooks/use-overlay-toast";
 import {
   Calendar,
   MessageCircle,
@@ -62,7 +62,7 @@ export default function SellerTransactions() {
   }, []);
 
   const [filter, setFilter] = useState<string>("all");
-  const { toast } = useToast();
+  const { showToast, overlayVisible } = useOverlayToast();
 
   const getStageIcon = (stage: Deal["Stage"]) => {
     switch (stage) {
@@ -147,20 +147,20 @@ export default function SellerTransactions() {
               : deal
           )
         );
-        toast({
+        showToast({
           title: "Deal Stage Updated",
           description: `${deal?.Deal_Name} has been moved to ${newStage}.`,
         });
         window.location.reload();
       } else {
-        toast({
+        showToast({
           title: "Deal Stage Updation Failed",
           description: `${deal?.Deal_Name} has been not been moved to ${newStage}. Please try again later.`,
         });
       }
     } catch (error) {
       console.error("Error in Edit Product:", error);
-      toast({
+      showToast({
         title: "Deal Stage Updation Failed",
         description: `Deal stage updation failed. Please try again later.`,
       });
@@ -218,20 +218,20 @@ export default function SellerTransactions() {
         }
       );
       if (response.data.code === "SUCCESS") {
-        toast({
+        showToast({
           title: "Deal Quantity Updated successfully.",
           description: `Your Deal Quantity has been successfully updated to ${newQuantity} for Deal id - ${id}`,
         });
         window.location.reload();
       } else {
-        toast({
+        showToast({
           title: "Deal Quantity Updation Failed",
           description: `Deal Quantity Updation Failed for Deal id - ${id}. Please try again later.`,
         });
       }
     } catch (error) {
       console.error("Error in Edit Product:", error);
-      toast({
+      showToast({
         title: "Deal Quantity Updation Failed",
         description: `Deal Quantity Updation Failed for Deal id - ${id}. Please try again later.`,
       });
@@ -247,295 +247,310 @@ export default function SellerTransactions() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">
-          My Transactions
-        </h1>
-        <p className="text-muted-foreground">
-          Manage your deals and track business opportunities
-        </p>
-      </div>
+    <>
+      {overlayVisible && (
+        <div className="fixed inset-0 bg-black/50 z-[50]" aria-hidden />
+      )}
+      <div className="space-y-6">
+        {/* Header */}
+        <div>
+          <h1 className="text-3xl font-bold text-foreground mb-2">
+            My Transactions
+          </h1>
+          <p className="text-muted-foreground">
+            Manage your deals and track business opportunities
+          </p>
+        </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-center">
-              <p className="text-sm font-medium text-muted-foreground">
-                Total Deals
-              </p>
-              <p className="text-2xl font-bold">{stats.total}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-center">
-              <p className="text-sm font-medium text-muted-foreground">
-                Contacted
-              </p>
-              <p className="text-2xl font-bold text-blue-600">
-                {stats.contacted}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-center">
-              <p className="text-sm font-medium text-muted-foreground">
-                In Negotiation
-              </p>
-              <p className="text-2xl font-bold text-yellow-600">
-                {stats.negotiation}
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-center">
-              <p className="text-sm font-medium text-muted-foreground">Won</p>
-              <p className="text-2xl font-bold text-green-600">{stats.won}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-center">
-              <p className="text-sm font-medium text-muted-foreground">Lost</p>
-              <p className="text-2xl font-bold text-red-600">{stats.lost}</p>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-4">
-            <div className="text-center">
-              <p className="text-sm font-medium text-muted-foreground">
-                Win Rate
-              </p>
-              <div className="flex items-center justify-center gap-1">
-                <p className="text-2xl font-bold text-professional-success">
-                  {stats.winRate}%
+        {/* Stats Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-center">
+                <p className="text-sm font-medium text-muted-foreground">
+                  Total Deals
                 </p>
-                <TrendingUp className="h-4 w-4 text-professional-success" />
+                <p className="text-2xl font-bold">{stats.total}</p>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
 
-      {/* Filters */}
-      <div className="flex items-center gap-4">
-        <span className="text-sm font-medium">Filter by stage:</span>
-        <Select value={filter} onValueChange={setFilter}>
-          <SelectTrigger className="w-48 bg-background z-50">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="bg-background border border-border shadow-lg z-50">
-            <SelectItem value="all">All Deals</SelectItem>
-            <SelectItem value="Contacted">Contacted</SelectItem>
-            <SelectItem value="In Negotiation">In Negotiation</SelectItem>
-            <SelectItem value="Closed Won">Closed Won</SelectItem>
-            <SelectItem value="Closed Lost">Closed Lost</SelectItem>
-          </SelectContent>
-        </Select>
-        <span className="text-sm text-muted-foreground">
-          {filteredDeals.length} deals found
-        </span>
-      </div>
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-center">
+                <p className="text-sm font-medium text-muted-foreground">
+                  Contacted
+                </p>
+                <p className="text-2xl font-bold text-blue-600">
+                  {stats.contacted}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
-      {/* Deals List */}
-      <div className="space-y-4">
-        {filteredDeals.map((deal) => (
-          <Card key={deal.id} className="hover:shadow-md transition-shadow">
-            <CardHeader className="pb-3">
-              <div className="flex items-start justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center gap-3 mb-2">
-                    <CardTitle className="text-lg">{deal.Deal_Name}</CardTitle>
-                    <Badge
-                      className={`${getStageColor(
-                        deal.Stage
-                      )} flex items-center gap-1`}
-                    >
-                      {getStageIcon(deal.Stage)}
-                      {deal.Stage}
-                    </Badge>
-                    {/* <Badge
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-center">
+                <p className="text-sm font-medium text-muted-foreground">
+                  In Negotiation
+                </p>
+                <p className="text-2xl font-bold text-yellow-600">
+                  {stats.negotiation}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-center">
+                <p className="text-sm font-medium text-muted-foreground">Won</p>
+                <p className="text-2xl font-bold text-green-600">{stats.won}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-center">
+                <p className="text-sm font-medium text-muted-foreground">
+                  Lost
+                </p>
+                <p className="text-2xl font-bold text-red-600">{stats.lost}</p>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardContent className="p-4">
+              <div className="text-center">
+                <p className="text-sm font-medium text-muted-foreground">
+                  Win Rate
+                </p>
+                <div className="flex items-center justify-center gap-1">
+                  <p className="text-2xl font-bold text-professional-success">
+                    {stats.winRate}%
+                  </p>
+                  <TrendingUp className="h-4 w-4 text-professional-success" />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Filters */}
+        <div className="flex items-center gap-4">
+          <span className="text-sm font-medium">Filter by stage:</span>
+          <Select value={filter} onValueChange={setFilter}>
+            <SelectTrigger className="w-48 bg-background z-50">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="bg-background border border-border shadow-lg z-50">
+              <SelectItem value="all">All Deals</SelectItem>
+              <SelectItem value="Contacted">Contacted</SelectItem>
+              <SelectItem value="In Negotiation">In Negotiation</SelectItem>
+              <SelectItem value="Closed Won">Closed Won</SelectItem>
+              <SelectItem value="Closed Lost">Closed Lost</SelectItem>
+            </SelectContent>
+          </Select>
+          <span className="text-sm text-muted-foreground">
+            {filteredDeals.length} deals found
+          </span>
+        </div>
+
+        {/* Deals List */}
+        <div className="space-y-4">
+          {filteredDeals.map((deal) => (
+            <Card key={deal.id} className="hover:shadow-md transition-shadow">
+              <CardHeader className="pb-3">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <CardTitle className="text-lg">
+                        {deal.Deal_Name}
+                      </CardTitle>
+                      <Badge
+                        className={`${getStageColor(
+                          deal.Stage
+                        )} flex items-center gap-1`}
+                      >
+                        {getStageIcon(deal.Stage)}
+                        {deal.Stage}
+                      </Badge>
+                      {/* <Badge
                       variant="outline"
                       className={getPriorityColor(deal.priority)}
                     >
                       {deal.priority} Priority
                     </Badge> */}
+                    </div>
+                    <p className="text-sm text-muted-foreground">
+                      Deal ID: {deal.id} • Product:{" "}
+                      {deal.Product_Name?.name || "NA"}
+                    </p>
                   </div>
-                  <p className="text-sm text-muted-foreground">
-                    Deal ID: {deal.id} • Product:{" "}
-                    {deal.Product_Name?.name || "NA"}
-                  </p>
+                  <div className="text-right">
+                    <p className="text-lg font-semibold text-primary">
+                      {deal.Estimated_Deal_Range}
+                    </p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-lg font-semibold text-primary">
-                    {deal.Estimated_Deal_Range}
-                  </p>
-                </div>
-              </div>
-            </CardHeader>
+              </CardHeader>
 
-            <CardContent className="space-y-4">
-              {/* Buyer Information */}
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 text-sm">
-                <div>
-                  <p className="font-medium text-muted-foreground">Buyer</p>
-                  <p className="font-medium">{deal.Account_Name.name}</p>
-                  {/* <p className="text-muted-foreground">{deal.buyerCompany}</p> */}
-                </div>
-                <div>
-                  <p className="font-medium text-muted-foreground">Contact</p>
-                  <p>{"Available in CRM"}</p>
-                </div>
-                <div>
-                  <p className="font-medium text-muted-foreground">Initiated</p>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    <span>
-                      {new Date(deal.Deal_Initiated_Date).toLocaleDateString()}
-                    </span>
+              <CardContent className="space-y-4">
+                {/* Buyer Information */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 text-sm">
+                  <div>
+                    <p className="font-medium text-muted-foreground">Buyer</p>
+                    <p className="font-medium">{deal.Account_Name.name}</p>
+                    {/* <p className="text-muted-foreground">{deal.buyerCompany}</p> */}
                   </div>
-                </div>
-                <div>
-                  <p className="font-medium text-muted-foreground">Closing</p>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
-                    <span>
-                      {new Date(deal.Closing_Date).toLocaleDateString()}
-                    </span>
+                  <div>
+                    <p className="font-medium text-muted-foreground">Contact</p>
+                    <p>{"Available in CRM"}</p>
                   </div>
-                </div>
-                <div>
-                  <p className="font-medium text-muted-foreground">Quantity</p>
-                  {!editingId || editingId !== deal.id ? (
-                    <div className="flex items-center gap-2">
-                      <span>{quantities[deal.id]}</span>
-                      {canUpdateStage(deal.Stage) && (
+                  <div>
+                    <p className="font-medium text-muted-foreground">
+                      Initiated
+                    </p>
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      <span>
+                        {new Date(
+                          deal.Deal_Initiated_Date
+                        ).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="font-medium text-muted-foreground">Closing</p>
+                    <div className="flex items-center gap-1">
+                      <Calendar className="h-3 w-3" />
+                      <span>
+                        {new Date(deal.Closing_Date).toLocaleDateString()}
+                      </span>
+                    </div>
+                  </div>
+                  <div>
+                    <p className="font-medium text-muted-foreground">
+                      Quantity
+                    </p>
+                    {!editingId || editingId !== deal.id ? (
+                      <div className="flex items-center gap-2">
+                        <span>{quantities[deal.id]}</span>
+                        {canUpdateStage(deal.Stage) && (
+                          <button
+                            className="text-muted-foreground hover:text-blue-600"
+                            onClick={() => setEditingId(deal.id)}
+                          >
+                            <Pencil className="w-4 h-4" />
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="number"
+                          min={1}
+                          value={quantities[deal.id]}
+                          onChange={(e) =>
+                            handleQuantityChange(deal.id, e.target.value)
+                          }
+                          className="border border-blue-300 rounded px-2 py-1 w-20 focus:outline-none focus:ring-1 focus:ring-blue-600"
+                        />
                         <button
-                          className="text-muted-foreground hover:text-blue-600"
-                          onClick={() => setEditingId(deal.id)}
+                          onClick={() => handleSave(deal.id)}
+                          className="text-blue-600 hover:text-blue-800"
+                          aria-label="Save"
                         >
-                          <Pencil className="w-4 h-4" />
+                          <CheckCircle className="w-5 h-5" />
                         </button>
-                      )}
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="number"
-                        min={1}
-                        value={quantities[deal.id]}
-                        onChange={(e) =>
-                          handleQuantityChange(deal.id, e.target.value)
-                        }
-                        className="border border-blue-300 rounded px-2 py-1 w-20 focus:outline-none focus:ring-1 focus:ring-blue-600"
-                      />
-                      <button
-                        onClick={() => handleSave(deal.id)}
-                        className="text-blue-600 hover:text-blue-800"
-                        aria-label="Save"
-                      >
-                        <CheckCircle className="w-5 h-5" />
-                      </button>
-                      <button
-                        onClick={() => handleCancel(deal.id)}
-                        className="text-gray-400 hover:text-red-500"
-                        aria-label="Cancel"
-                      >
-                        <XCircle className="w-5 h-5" />
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Stage Update Actions */}
-              {canUpdateStage(deal.Stage) && (
-                <div className="pt-2 border-t border-border">
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="font-medium">Update Stage:</span>
-                    {getNextStages(deal.Stage).map((stage) => (
-                      <Button
-                        key={stage}
-                        variant="outline"
-                        size="sm"
-                        onClick={() =>
-                          handleStageUpdate(deal.id, stage as Deal["Stage"])
-                        }
-                        className={cn(
-                          "flex items-center gap-1",
-                          stage === "Agreement Reached" &&
-                            "border-yellow-300 text-yellow-700 hover:bg-red-50",
-                          stage === "Closed Won" &&
-                            "border-green-300 text-green-700 hover:bg-green-50",
-                          stage === "Closed Lost" &&
-                            "border-red-300 text-red-700 hover:bg-red-50"
-                        )}
-                      >
-                        {stage === "Negotiating Terms" && (
-                          <ArrowRight className="h-3 w-3" />
-                        )}
-                        {stage === "Agreement Reached" && (
-                          <ArrowRight className="h-3 w-3" />
-                        )}
-                        {stage === "Closed Won" && (
-                          <CheckCircle2 className="h-3 w-3" />
-                        )}
-                        {stage === "Closed Lost" && (
-                          <XCircle className="h-3 w-3" />
-                        )}
-                        Move to {stage}
-                      </Button>
-                    ))}
+                        <button
+                          onClick={() => handleCancel(deal.id)}
+                          className="text-gray-400 hover:text-red-500"
+                          aria-label="Cancel"
+                        >
+                          <XCircle className="w-5 h-5" />
+                        </button>
+                      </div>
+                    )}
                   </div>
                 </div>
-              )}
 
-              {/* Completed Deal Info */}
-              {(deal.Stage === "Closed Won" ||
-                deal.Stage === "Closed Lost") && (
-                <div className="pt-2 border-t border-border">
-                  <p className="text-sm text-muted-foreground">
-                    Deal completed on{" "}
-                    {new Date(deal.Closing_Date).toLocaleDateString()}
-                    {deal.Stage === "Closed Won" && " - Congratulations! 🎉"}
-                  </p>
-                </div>
-              )}
+                {/* Stage Update Actions */}
+                {canUpdateStage(deal.Stage) && (
+                  <div className="pt-2 border-t border-border">
+                    <div className="flex items-center gap-2 text-sm">
+                      <span className="font-medium">Update Stage:</span>
+                      {getNextStages(deal.Stage).map((stage) => (
+                        <Button
+                          key={stage}
+                          variant="outline"
+                          size="sm"
+                          onClick={() =>
+                            handleStageUpdate(deal.id, stage as Deal["Stage"])
+                          }
+                          className={cn(
+                            "flex items-center gap-1",
+                            stage === "Agreement Reached" &&
+                              "border-yellow-300 text-yellow-700 hover:bg-red-50",
+                            stage === "Closed Won" &&
+                              "border-green-300 text-green-700 hover:bg-green-50",
+                            stage === "Closed Lost" &&
+                              "border-red-300 text-red-700 hover:bg-red-50"
+                          )}
+                        >
+                          {stage === "Negotiating Terms" && (
+                            <ArrowRight className="h-3 w-3" />
+                          )}
+                          {stage === "Agreement Reached" && (
+                            <ArrowRight className="h-3 w-3" />
+                          )}
+                          {stage === "Closed Won" && (
+                            <CheckCircle2 className="h-3 w-3" />
+                          )}
+                          {stage === "Closed Lost" && (
+                            <XCircle className="h-3 w-3" />
+                          )}
+                          Move to {stage}
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Completed Deal Info */}
+                {(deal.Stage === "Closed Won" ||
+                  deal.Stage === "Closed Lost") && (
+                  <div className="pt-2 border-t border-border">
+                    <p className="text-sm text-muted-foreground">
+                      Deal completed on{" "}
+                      {new Date(deal.Closing_Date).toLocaleDateString()}
+                      {deal.Stage === "Closed Won" && " - Congratulations! 🎉"}
+                    </p>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {filteredDeals.length === 0 && (
+          <Card className="text-center py-12">
+            <CardContent>
+              <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+              <h3 className="text-lg font-semibold mb-2">
+                {filter === "all" ? "No Deals Yet" : `No ${filter} Deals`}
+              </h3>
+              <p className="text-muted-foreground">
+                {filter === "all"
+                  ? "Buyer contact requests will appear here once they discover your products."
+                  : `You don't have any deals in ${filter} stage currently.`}
+              </p>
             </CardContent>
           </Card>
-        ))}
+        )}
       </div>
-
-      {filteredDeals.length === 0 && (
-        <Card className="text-center py-12">
-          <CardContent>
-            <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-            <h3 className="text-lg font-semibold mb-2">
-              {filter === "all" ? "No Deals Yet" : `No ${filter} Deals`}
-            </h3>
-            <p className="text-muted-foreground">
-              {filter === "all"
-                ? "Buyer contact requests will appear here once they discover your products."
-                : `You don't have any deals in ${filter} stage currently.`}
-            </p>
-          </CardContent>
-        </Card>
-      )}
-    </div>
+    </>
   );
 }

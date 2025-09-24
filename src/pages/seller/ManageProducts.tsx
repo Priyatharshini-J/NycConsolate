@@ -20,7 +20,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import { useOverlayToast } from "@/hooks/use-overlay-toast";
 import { Edit, Trash2, Eye, Package, ImagePlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import axios from "axios";
@@ -41,6 +41,8 @@ interface Product {
 export default function ManageProducts() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const { showToast, overlayVisible } = useOverlayToast();
 
   const navigate = useNavigate();
 
@@ -74,7 +76,6 @@ export default function ManageProducts() {
     Minimum_Order_Quantity: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const { toast } = useToast();
 
   const handleEditClick = async (product: Product) => {
     setEditingProduct(product);
@@ -87,6 +88,12 @@ export default function ManageProducts() {
       Minimum_Order_Quantity: product.Minimum_Order_Quantity.toString(),
     });
     setErrors({});
+    setIsDialogOpen(true);
+  };
+
+  const handleCancel = () => {
+    setEditingProduct(null);
+    setIsDialogOpen(false);
   };
 
   const handleInputChange = (field: string, value: string) => {
@@ -162,20 +169,20 @@ export default function ManageProducts() {
       );
 
       if (response.data.code === "SUCCESS") {
-        toast({
+        showToast({
           title: "Product Updated",
           description: "Your product has been successfully updated.",
         });
         window.location.reload();
       } else {
-        toast({
+        showToast({
           title: "Product Update Failed",
           description: "Your product has not been successfully updated.",
         });
       }
     } catch (error) {
       console.error("Error in Edit Product:", error);
-      toast({
+      showToast({
         title: "Product Update Failed",
         description: "Your product has not been successfully updated.",
       });
@@ -202,19 +209,19 @@ export default function ManageProducts() {
       if (response.data.code === "SUCCESS") {
         setProducts((prev) => prev.filter((p) => p.id !== productId));
 
-        toast({
+        showToast({
           title: "Product Deleted",
           description: `${productName} has been removed from your catalog.`,
         });
       } else {
-        toast({
+        showToast({
           title: "Product Deletion Failed",
           description: `${productName} deletion has failed. Please try again later`,
         });
       }
     } catch (error) {
       console.error("Failed to delete product:", error);
-      toast({
+      showToast({
         title: "Product Deletion Failed",
         description: `${productName} deletion has failed. Please try again later`,
       });
@@ -234,6 +241,9 @@ export default function ManageProducts() {
 
   return (
     <>
+      {overlayVisible && (
+        <div className="fixed inset-0 bg-black/50 z-[50]" aria-hidden />
+      )}
       {loading ? (
         <p className="loading">Loading ....</p>
       ) : (
@@ -242,7 +252,7 @@ export default function ManageProducts() {
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl font-bold text-foreground mb-2">
-                Modify My Products
+                My Products
               </h1>
               <p className="text-muted-foreground">
                 Update and manage your existing product catalog
@@ -507,12 +517,6 @@ export default function ManageProducts() {
                             <div className="flex gap-2 pt-4">
                               <Button onClick={handleUpdateProduct}>
                                 Update Product
-                              </Button>
-                              <Button
-                                variant="outline"
-                                onClick={() => setEditingProduct(null)}
-                              >
-                                Cancel
                               </Button>
                             </div>
                           </div>

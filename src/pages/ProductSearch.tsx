@@ -13,6 +13,7 @@ import { ProductCard } from "@/components/products/ProductCard";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
 import { BASE_URL, buyerAccountId } from "../constants";
+import { useOverlayToast } from "@/hooks/use-overlay-toast";
 
 export default function ProductSearch() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -21,7 +22,7 @@ export default function ProductSearch() {
   const [ratingFilter, setRatingFilter] = useState("");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const { toast } = useToast();
+  const { showToast, overlayVisible } = useOverlayToast();
 
   const fetchProducts = async () => {
     try {
@@ -59,12 +60,12 @@ export default function ProductSearch() {
         }
       );
       if (response.data.code === "SUCCESS") {
-        toast({
+        showToast({
           title: "Contact Request Sent",
           description: `Your contact request has been sent to ${sellerName}. A deal record has been created in your transactions.`,
         });
       } else {
-        toast({
+        showToast({
           title: "Contact Request Failed",
           description: `Your contact request has failed. Try again after sometime.`,
         });
@@ -114,6 +115,9 @@ export default function ProductSearch() {
 
   return (
     <>
+      {overlayVisible && (
+        <div className="fixed inset-0 bg-black/50 z-[50]" aria-hidden />
+      )}
       {loading ? (
         <p className="loading">Loading ....</p>
       ) : (

@@ -17,7 +17,13 @@ const Login = () => {
         <div className="container mx-auto px-4 py-2">
           <div className="flex items-center justify-center">
             <div className="flex items-center gap-3">
-              <div className="w-8 h-4 bg-gradient-to-r from-gov-orange via-white to-green-600"></div>
+              <div className="w-8 h-4">
+                <img
+                  src="https://flag-bucket-development.zohostratus.com/Flag_of_India.svg.png"
+                  alt="Indian Flag"
+                  className="w-full h-full object-cover"
+                />
+              </div>
               <span className="text-sm font-medium text-gray-700">
                 GOVERNMENT OF INDIA
               </span>

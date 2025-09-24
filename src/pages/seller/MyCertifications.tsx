@@ -12,7 +12,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
-import { useToast } from "@/hooks/use-toast";
+import { useOverlayToast } from "@/hooks/use-overlay-toast";
 import {
   Award,
   Plus,
@@ -47,6 +47,7 @@ export default function MyCertifications() {
   const [reloadCertsFlag, setReloadCertsFlag] = useState(false);
   const [loading, setLoading] = useState(true);
   const [imagePreview, setImagePreview] = useState<string>("");
+  const { showToast, overlayVisible } = useOverlayToast();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -59,21 +60,20 @@ export default function MyCertifications() {
       reader.readAsDataURL(file);
     }
   };
-
+  const fetchCertificates = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get(
+        `${BASE_URL}/server/b2b_backend_function/getSellerCertifications/${sellerAccountId}`
+      );
+      setCertifications(res.data);
+    } catch (err) {
+      console.error("Failed to fetch Products", err);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchCertificates = async () => {
-      try {
-        const res = await axios.get(
-          `${BASE_URL}/server/b2b_backend_function/getSellerCertifications/${sellerAccountId}`
-        );
-        setCertifications(res.data);
-      } catch (err) {
-        console.error("Failed to fetch Products", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchCertificates();
   }, [reloadCertsFlag]);
 
@@ -88,7 +88,6 @@ export default function MyCertifications() {
     image: null as File | null,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const { toast } = useToast();
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -187,21 +186,23 @@ export default function MyCertifications() {
           imageUrl: fileUrl,
         }
       );
+      setLoading(true);
       if (response.data.code === "SUCCESS") {
-        toast({
+        showToast({
           title: "Certification Added",
           description: "Your certification has been successfully added.",
         });
       } else {
-        toast({
+        showToast({
           title: "Certification Addition Failed",
           description:
             "Your certification addition has been failed. Please try again later.",
         });
       }
+      setLoading(false);
     } catch (error) {
       console.error("Error in Add New Product:", error);
-      toast({
+      showToast({
         title: "Certification Addition Failed",
         description:
           "Your certification addition has been failed. Please try again later.",
@@ -211,6 +212,7 @@ export default function MyCertifications() {
     resetForm();
     setIsAddingNew(false);
     setReloadCertsFlag((f) => !f);
+    fetchCertificates();
   };
 
   const handleUpdateCertification = async () => {
@@ -228,9 +230,9 @@ export default function MyCertifications() {
           expiryDate: formData.expiryDate,
         }
       );
-
+      setLoading(true);
       if (response.data.code === "SUCCESS") {
-        toast({
+        showToast({
           title: "Certification Updated",
           description: "Your certification has been successfully updated.",
         });
@@ -242,15 +244,16 @@ export default function MyCertifications() {
           )
         );
       } else {
-        toast({
+        showToast({
           title: "Certification Updation Failed",
           description:
             "Your certification updation has failed. Please try again later",
         });
       }
+      setLoading(false);
     } catch (error) {
       console.error("Error in Edit Certificate:", error);
-      toast({
+      showToast({
         title: "Certification Updation Failed",
         description:
           "Your certification updation has failed. Please try again later",
@@ -270,23 +273,24 @@ export default function MyCertifications() {
       const response = await axios.delete(
         `${BASE_URL}/server/b2b_backend_function/deleteSellerCertifications/${certId}`
       );
-
+      setLoading(true);
       if (response.data.code === "SUCCESS") {
         setCertifications((prev) => prev.filter((cert) => cert.id !== certId));
-        toast({
+        showToast({
           title: "Certification Deleted",
           description: `${certName} has been removed from your certifications.`,
         });
       } else {
-        toast({
+        showToast({
           title: "Certification Deletion Failed",
           description:
             "Your certification deletion has failed. Please try again later",
         });
       }
+      setLoading(false);
     } catch (error) {
       console.error("Error in Edit Certificate:", error);
-      toast({
+      showToast({
         title: "Certification Deletion Failed",
         description:
           "Your certification deletion has failed. Please try again later",
@@ -333,6 +337,9 @@ export default function MyCertifications() {
 
   return (
     <>
+      {overlayVisible && (
+        <div className="fixed inset-0 bg-black/50 z-[50]" aria-hidden />
+      )}
       {loading ? (
         <p className="loading">Loading ....</p>
       ) : (

@@ -12,6 +12,8 @@ import {
   ScanEye,
   Globe,
   User,
+  PhoneCall,
+  Mail,
 } from "lucide-react";
 
 interface Buyer {
@@ -26,6 +28,10 @@ interface Buyer {
   Primary_Contact: { id: string; name: string };
   Account_Status: string;
   Website: string;
+  First_Name: string;
+  Last_Name: string;
+  Email: string;
+  Mobile: string;
 }
 
 interface BuyerCardProps {
@@ -64,17 +70,44 @@ export function BuyerCard({ buyer }: BuyerCardProps) {
                 {buyer.Account_Status ? buyer.Account_Status : "NA"}
               </Badge>
             </div>
-            {/* <div className="flex items-center gap-2 mb-1">
-              <StarRating rating={seller.Average_Rating} size="sm" />
-              <span className="text-sm text-muted-foreground">
-                ({seller.Rating_Count} reviews)
-              </span>
-            </div> */}
             <div className="flex items-center gap-1 text-sm text-muted-foreground">
               <MapPin className="h-3 w-3" />
               <span>
                 {buyer.Billing_State},{buyer.Billing_Country}
               </span>
+            </div>
+          </div>
+        </div>
+
+        {/* Contact Info Section */}
+
+        <div className="mb-4 p-4 bg-muted rounded-md text-sm text-muted-foreground space-y-2">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <User className="w-4 h-4 text-primary" />
+              <span>
+                {buyer.First_Name} {buyer.Last_Name}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Mail className="w-4 h-4 text-primary" />
+              <a
+                href={`mailto:${buyer.Email}`}
+                className="underline hover:text-primary"
+              >
+                {buyer.Email}
+              </a>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <PhoneCall className="w-4 h-4 text-primary" />
+              <a
+                href={`tel:${buyer.Mobile}`}
+                className="underline hover:text-primary"
+              >
+                {buyer.Mobile}
+              </a>
             </div>
           </div>
         </div>

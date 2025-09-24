@@ -8,6 +8,7 @@ import { useToast } from "@/hooks/use-toast";
 import { User, Building, Globe, Phone, Mail, MapPin } from "lucide-react";
 import axios from "axios";
 import { BASE_URL, buyerAccountId, buyerId } from "../constants";
+import { useOverlayToast } from "@/hooks/use-overlay-toast";
 
 interface Profile {
   id: string;
@@ -27,6 +28,7 @@ interface Profile {
 }
 
 export default function AccountProfile() {
+  const { showToast, overlayVisible } = useOverlayToast();
   const [profile, setProfile] = useState<Profile>();
   const [formData, setFormData] = useState({
     firstName: "",
@@ -45,20 +47,19 @@ export default function AccountProfile() {
   });
   const [loading, setLoading] = useState(true);
 
+  const fetchBuyer = async () => {
+    try {
+      const res = await axios.get(
+        `${BASE_URL}/server/b2b_backend_function/getBuyer/${buyerId}`
+      );
+      setProfile(res.data);
+    } catch (err) {
+      console.error("Failed to fetch buyer", err);
+    } finally {
+      setLoading(false);
+    }
+  };
   useEffect(() => {
-    const fetchBuyer = async () => {
-      try {
-        const res = await axios.get(
-          `${BASE_URL}/server/b2b_backend_function/getBuyer/${buyerId}`
-        );
-        setProfile(res.data);
-      } catch (err) {
-        console.error("Failed to fetch buyer", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchBuyer();
   }, []);
 
@@ -112,13 +113,13 @@ export default function AccountProfile() {
       );
 
       if (response.data.code === "SUCCESS") {
-        toast({
+        showToast({
           title: "Profile Updated",
           description:
             "Your profile information has been successfully updated.",
         });
       } else {
-        toast({
+        showToast({
           title: "Profile Update Failed",
           description:
             "Your profile information update has been failed. Please try again later.",
@@ -126,7 +127,7 @@ export default function AccountProfile() {
       }
     } catch (error) {
       console.error("Error in Buyer profile:", error);
-      toast({
+      showToast({
         title: "Profile Update Failed",
         description:
           "Your profile information update has been failed. Please try again later.",
@@ -136,6 +137,9 @@ export default function AccountProfile() {
 
   return (
     <>
+      {overlayVisible && (
+        <div className="fixed inset-0 bg-black/50 z-[50]" aria-hidden />
+      )}
       {loading ? (
         <p className="loading">Loading ....</p>
       ) : (

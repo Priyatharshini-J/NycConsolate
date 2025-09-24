@@ -411,39 +411,76 @@ app.get("/getVendors", async (req, res) => {
 			}
 		}
 		const accessToken = await catalystApp.connection(credentials).getConnector('crm_connector').getAccessToken()
-		const vendors = await axios.get(`https://www.zohoapis.com/crm/v7/Vendors`, {
-			params: {
-				fields: "id,Vendor_Name,Business_Description,Average_Rating,Rating_Count,State,Country,Years_in_Business,Employee_Count,Vendor_Certifications,Engagement_Score"
+
+		const contactsVendorsResponse = await axios.post(
+			"https://www.zohoapis.com/crm/v7/coql",
+			{
+				"select_query": "select First_Name, Last_Name, Email, Mobile, Vendor_Account.id, Vendor_Account.Vendor_Name, Vendor_Account.Business_Description, Vendor_Account.Average_Rating, Vendor_Account.Rating_Count, Vendor_Account.State, Vendor_Account.Country, Vendor_Account.Years_in_Business, Vendor_Account.Employee_Count, Vendor_Account.Engagement_Score from Contacts where Vendor_Account is not null"
 			},
-			headers: {
-				Authorization: `Zoho-oauthtoken ${accessToken}`
+			{
+				headers: {
+					Authorization: `Zoho-oauthtoken ${accessToken}`,
+					"Content-Type": "application/json",
+				},
 			}
-		});
-		const vendorsRawData = vendors.data.data;
-		const certificates = await axios.get(`https://www.zohoapis.com/crm/v7/Certifications`, {
-			params: {
-				fields: "Name,Vendor"
+		);
+
+		const contactsVendorsData = contactsVendorsResponse.data.data;
+
+		const vendorIds = [
+			...new Set(contactsVendorsData.map((row) => row["Vendor_Account.id"])),
+		];
+
+		if (vendorIds.length === 0) {
+			return [];
+		}
+
+		const certificationsResponse = await axios.post(
+			"https://www.zohoapis.com/crm/v7/coql",
+			{
+				select_query: `select Name, Vendor.id from Certifications where Vendor.id in (${vendorIds
+					.map((id) => `'${id}'`)
+					.join(",")})`,
 			},
-			headers: {
-				Authorization: `Zoho-oauthtoken ${accessToken}`
+			{
+				headers: {
+					Authorization: `Zoho-oauthtoken ${accessToken}`,
+					"Content-Type": "application/json",
+				},
 			}
-		});
-		const certificationsRawData = certificates.data.data;
-		const certificatesMap = {};
-		certificationsRawData.forEach(cert => {
-			const vendorId = cert.Vendor.id;
-			if (!certificatesMap[vendorId]) {
-				certificatesMap[vendorId] = [];
+		);
+
+		const certificationsData = certificationsResponse.data.data;
+
+		const certificationsMap = {};
+		certificationsData.forEach((cert) => {
+			const vendorId = cert["Vendor.id"];
+			if (!certificationsMap[vendorId]) {
+				certificationsMap[vendorId] = [];
 			}
-			certificatesMap[vendorId].push(cert.Name);
+			certificationsMap[vendorId].push(cert.Name);
 		});
 
-		const mergedVendors = vendorsRawData.map(v => ({
-			...v,
-			certifications: certificatesMap[v.id] || []
+		// 4. Combine Contacts+Vendors with certifications
+		const combined = contactsVendorsData.map((row) => ({
+			First_Name: row.First_Name,
+			Last_Name: row.Last_Name,
+			Email: row.Email,
+			Mobile: row.Mobile,
+			Vendor_Name: row["Vendor_Account.Vendor_Name"],
+			Business_Description: row["Vendor_Account.Business_Description"],
+			vendorAccountId: row["Vendor_Account.id"],
+			Average_Rating: row["Vendor_Account.Average_Rating"],
+			Rating_Count: row["Vendor_Account.Rating_Count"],
+			State: row["Vendor_Account.State"],
+			Country: row["Vendor_Account.Country"],
+			Years_in_Business: row["Vendor_Account.Years_in_Business"],
+			Employee_Count: row["Vendor_Account.Employee_Count"],
+			Engagement_Score: row["Vendor_Account.Engagement_Score"],
+			certifications: certificationsMap[row["Vendor_Account.id"]] || [],
 		}));
 
-		res.status(200).json(mergedVendors);
+		res.status(200).json(combined);
 	} catch (err) {
 		console.log("Error in GET Vendors >>> " + err);
 		res.status(500).send({
@@ -467,17 +504,42 @@ app.get("/getBuyers", async (req, res) => {
 		}
 
 		const accessToken = await catalystApp.connection(credentials).getConnector('crm_connector').getAccessToken()
-		const buyers = await axios.get(`https://www.zohoapis.com/crm/v8/Accounts`, {
-			params: {
-				fields: "id,Account_Name,Business_Description,Billing_State,Billing_Country,No_of_Employees,Business_License_Number,Tax_Identification_Number,Primary_Contact,Account_Status,Website"
-			},
-			headers: {
-				Authorization: `Zoho-oauthtoken ${accessToken}`
-			}
+		const coqlQuery = {
+			"select_query": "SELECT id, First_Name, Last_Name, Email, Mobile, Buyer_Account.id, Buyer_Account.Account_Name, Buyer_Account.Business_Description, Buyer_Account.Billing_State, Buyer_Account.Billing_Country, Buyer_Account.No_of_Employees, Buyer_Account.Business_License_Number, Buyer_Account.Tax_Identification_Number, Buyer_Account.Primary_Contact, Buyer_Account.Account_Status, Buyer_Account.Website from Contacts where Buyer_Account is not null",
+		};
 
-		});
-		const buyersRawData = buyers.data.data;
-		res.status(200).json(buyersRawData);
+		const response = await axios.post(
+			"https://www.zohoapis.com/crm/v7/coql",
+			coqlQuery,
+			{
+				headers: {
+					Authorization: `Zoho-oauthtoken ${accessToken}`,
+					"Content-Type": "application/json",
+				},
+			}
+		);
+
+		const rawData = response.data.data;
+
+		// Flatten Contact + Buyer_Account into one object
+		const flattened = rawData.map((record) => ({
+			First_Name: record.First_Name,
+			Last_Name: record.Last_Name,
+			Email: record.Email,
+			Mobile: record.Mobile,
+			id: record["Buyer_Account.id"] || null,
+			Account_Name: record["Buyer_Account.Account_Name"] || "",
+			Business_Description: record["Buyer_Account.Business_Description"] || "",
+			Billing_State: record["Buyer_Account.Billing_State"] || "",
+			Billing_Country: record["Buyer_Account.Billing_Country"] || "",
+			No_of_Employees: record["Buyer_Account.No_of_Employees"] || null,
+			Business_License_Number: record["Buyer_Account.Business_License_Number"] || "",
+			Tax_Identification_Number: record["Buyer_Account.Tax_Identification_Number"] || "",
+			Primary_Contact: record["Buyer_Account.Primary_Contact"] || "",
+			Account_Status: record["Buyer_Account.Account_Status"] || "",
+			Website: record["Buyer_Account.Website"] || "",
+		}));
+		res.status(200).json(flattened);
 	} catch (err) {
 		console.log("Error in GET Buyers >>> " + err);
 		res.status(500).send({
