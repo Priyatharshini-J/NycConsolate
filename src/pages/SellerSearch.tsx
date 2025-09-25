@@ -12,9 +12,11 @@ import {
 import { SellerCard } from "@/components/sellers/SellerCard";
 import { useOverlayToast } from "@/hooks/use-overlay-toast";
 import axios from "axios";
-import { BASE_URL, buyerAccountId } from "../constants";
+import { BASE_URL } from "../constants";
+import { useAccount } from "../context/AccountContext";
 
 export default function SellerSearch() {
+  const { accountId, contactId, loadingAuth } = useAccount();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [certificationFilter, setCertificationFilter] = useState("");
@@ -47,7 +49,7 @@ export default function SellerSearch() {
       const response = await axios.post(
         `${BASE_URL}/server/b2b_backend_function/postDeal`,
         {
-          buyerAccountId,
+          buyerAccountId: accountId,
           name: `${sellerName}_${Date.now()}`,
           sellerId,
           initiatedDate: formatDate(new Date()),

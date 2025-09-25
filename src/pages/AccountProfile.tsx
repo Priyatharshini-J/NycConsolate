@@ -1,14 +1,23 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
-import { User, Building, Globe, Phone, Mail, MapPin } from "lucide-react";
+import {
+  User,
+  Building,
+  Globe,
+  Phone,
+  Mail,
+  MapPin,
+  ChartNoAxesColumnDecreasing,
+} from "lucide-react";
 import axios from "axios";
-import { BASE_URL, buyerAccountId, buyerId } from "../constants";
+import { BASE_URL } from "../constants";
 import { useOverlayToast } from "@/hooks/use-overlay-toast";
+import { useAccount } from "../context/AccountContext";
 
 interface Profile {
   id: string;
@@ -28,6 +37,7 @@ interface Profile {
 }
 
 export default function AccountProfile() {
+  const { accountId, contactId, loadingAuth } = useAccount();
   const { showToast, overlayVisible } = useOverlayToast();
   const [profile, setProfile] = useState<Profile>();
   const [formData, setFormData] = useState({
@@ -45,12 +55,13 @@ export default function AccountProfile() {
     country: "",
     bio: "",
   });
+
   const [loading, setLoading] = useState(true);
 
-  const fetchBuyer = async () => {
+  const fetchBuyer = useCallback(async () => {
     try {
       const res = await axios.get(
-        `${BASE_URL}/server/b2b_backend_function/getBuyer/${buyerId}`
+        `${BASE_URL}/server/b2b_backend_function/getBuyer/${contactId}`
       );
       setProfile(res.data);
     } catch (err) {
@@ -58,13 +69,16 @@ export default function AccountProfile() {
     } finally {
       setLoading(false);
     }
-  };
-  useEffect(() => {
-    fetchBuyer();
-  }, []);
+  }, [contactId]);
 
   useEffect(() => {
-    if (profile && Object.keys(profile).length > 0) {
+    if (!loadingAuth && contactId) {
+      fetchBuyer();
+    }
+  }, [loadingAuth, contactId, fetchBuyer]);
+
+  useEffect(() => {
+    if (!loadingAuth && profile && Object.keys(profile).length > 0) {
       setFormData({
         firstName: profile.First_Name || "",
         lastName: profile.Last_Name || "",
@@ -81,7 +95,7 @@ export default function AccountProfile() {
         bio: profile.Business_Description || "",
       });
     }
-  }, [profile]);
+  }, [profile, loadingAuth]);
 
   const { toast } = useToast();
 
@@ -93,7 +107,7 @@ export default function AccountProfile() {
     try {
       // Send updated product data to backend for editing in ZOHO CRM Product's module
       const response = await axios.put(
-        `${BASE_URL}/server/b2b_backend_function/buyer/${buyerId}`,
+        `${BASE_URL}/server/b2b_backend_function/buyer/${contactId}`,
         {
           firstName: formData.firstName,
           lastName: formData.lastName,
@@ -108,7 +122,7 @@ export default function AccountProfile() {
           zipCode: formData.zipCode,
           country: formData.country,
           bio: formData.bio,
-          buyerAccountId: buyerAccountId,
+          buyerAccountId: accountId,
         }
       );
 
@@ -140,7 +154,7 @@ export default function AccountProfile() {
       {overlayVisible && (
         <div className="fixed inset-0 bg-black/50 z-[50]" aria-hidden />
       )}
-      {loading ? (
+      {loading || loadingAuth ? (
         <p className="loading">Loading ....</p>
       ) : (
         <div className="space-y-6">

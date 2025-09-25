@@ -12,7 +12,7 @@ import {
 import { SellerCard } from "@/components/sellers/SellerCard";
 import { useOverlayToast } from "@/hooks/use-overlay-toast";
 import axios from "axios";
-import { BASE_URL, buyerAccountId } from "../../constants";
+import { BASE_URL } from "../../constants";
 import { BuyerCard } from "@/components/buyers/BuyerCard";
 
 export default function BuyerSearch() {

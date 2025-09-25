@@ -24,6 +24,75 @@ const corsOptions = {
 
 // app.use(cors(corsOptions));
 
+app.post("/inviteUser", async (req, res) => {
+	try {
+		const Email = req.headers["email"];
+		const Firstname = req.headers["firstname"];
+		const Lastname = req.headers["lastname"];
+		const Type = req.headers["type"];
+
+		const catalystApp = catalyst.initialize(req);
+		//Create a JSON object for adding a new user 
+		const signupConfig = {
+			platform_type: 'web',
+			template_details: {
+				senders_mail: 'priyatharshini.ja+solutions@zohotest.com',
+				subject: 'Welcome to the Indian Consulate NYC Trade Platform',
+				message: '<p>Hello %FIRST_NAME% %LAST_NAME%,</p> <p>You have been invited to join NYC Trade Platform team. You can access the app from this link:</p> <p><a href=' % LINK % '>%LINK%</a></p> <p>You are assigned to the role %ROLE_NAME% in this app.</p> <p>If you didn’t ask to join the application or if you think this was a mistake, you can ignore this email.</p> <p>Thanks,</p> <p></p> <p>Indian Consulate</p>'
+			},
+			redirect_url: 'https://icnycconsulate.onslate.com'
+		};
+		const roleId = Type === "Buyer" ? "12130000058057179" : "12130000058057188";
+		let userConfig = {
+			first_name: Firstname,
+			last_name: Lastname,
+			email_id: Email,
+			role_id: roleId
+		};
+
+		let userManagement = catalystApp.userManagement();
+		await userManagement.registerUser(signupConfig, userConfig);
+
+		const credentials = {
+			crm_connector: {
+				client_id: CLIENTID,
+				client_secret: CLIENT_SECRET,
+				auth_url: AUTH_HOST,
+				refresh_url: AUTH_HOST,
+				refresh_token: REFRESH_TOKEN
+			}
+		}
+		const account = Type === "Buyer" ? "Buyer_Account" : "Vendor_Account";
+		const accessToken = await catalystApp.connection(credentials).getConnector('crm_connector').getAccessToken()
+		const coqlQuery = {
+			"select_query": `select id,${account} from Contacts where Email='${Email}'`,
+		};
+
+		const response = await axios.post(
+			"https://www.zohoapis.com/crm/v7/coql",
+			coqlQuery,
+			{
+				headers: {
+					Authorization: `Zoho-oauthtoken ${accessToken}`,
+					"Content-Type": "application/json",
+				},
+			}
+		);
+
+		const rawData = response.data.data[0];
+		const ContactId = rawData.id;
+		const AccountId = rawData[account].id;
+		await catalystApp.datastore().table('IdMapping').insertRow({ Email, ContactId, AccountId });
+		res.status(200).json("User added successfully !!!");
+	} catch (err) {
+		console.log("Error in inviting user >>> " + JSON.stringify(err));
+		res.status(500).send({
+			message: "Internal Server Error. Please try again after sometime.",
+			error: err
+		});
+	}
+});
+
 app.get("/getBuyer/:id", async (req, res) => {
 	try {
 		const buyerId = req.params.id;

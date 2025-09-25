@@ -12,10 +12,12 @@ import {
 import { ProductCard } from "@/components/products/ProductCard";
 import { useToast } from "@/hooks/use-toast";
 import axios from "axios";
-import { BASE_URL, buyerAccountId } from "../constants";
+import { BASE_URL } from "../constants";
 import { useOverlayToast } from "@/hooks/use-overlay-toast";
+import { useAccount } from "../context/AccountContext";
 
 export default function ProductSearch() {
+  const { accountId, loadingAuth } = useAccount();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [certificationFilter, setCertificationFilter] = useState("");
@@ -41,7 +43,6 @@ export default function ProductSearch() {
   useEffect(() => {
     fetchProducts();
   }, []);
-
   const handleContactSeller = async (
     productName: string,
     productId: string,
@@ -52,7 +53,7 @@ export default function ProductSearch() {
       const response = await axios.post(
         `${BASE_URL}/server/b2b_backend_function/postDeal`,
         {
-          buyerAccountId,
+          buyerAccountId: accountId,
           name: `${productName}_${Date.now()}`,
           productId,
           sellerId,
@@ -118,7 +119,7 @@ export default function ProductSearch() {
       {overlayVisible && (
         <div className="fixed inset-0 bg-black/50 z-[50]" aria-hidden />
       )}
-      {loading ? (
+      {loading || loadingAuth ? (
         <p className="loading">Loading ....</p>
       ) : (
         <div className="space-y-6">

@@ -15,7 +15,8 @@ import {
   Calendar,
 } from "lucide-react";
 import axios from "axios";
-import { BASE_URL, sellerAccountId, sellerId } from "../../constants";
+import { BASE_URL } from "../../constants";
+import { useAccount } from "../../context/AccountContext";
 
 interface Profile {
   id: string;
@@ -38,6 +39,7 @@ interface Profile {
 }
 
 export default function SellerProfile() {
+  const { accountId, contactId, loadingAuth } = useAccount();
   const [profile, setProfile] = useState<Profile>();
   const [formData, setFormData] = useState({
     companyName: "",
@@ -60,24 +62,26 @@ export default function SellerProfile() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchBuyer = async () => {
-      try {
-        const res = await axios.get(
-          `${BASE_URL}/server/b2b_backend_function/getSeller/${sellerId}`
-        );
-        setProfile(res.data);
-      } catch (err) {
-        console.error("Failed to fetch order", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (!loadingAuth && contactId) {
+      const fetchBuyer = async () => {
+        try {
+          const res = await axios.get(
+            `${BASE_URL}/server/b2b_backend_function/getSeller/${contactId}`
+          );
+          setProfile(res.data);
+        } catch (err) {
+          console.error("Failed to fetch order", err);
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    fetchBuyer();
-  }, []);
+      fetchBuyer();
+    }
+  }, [loadingAuth, contactId]);
 
   useEffect(() => {
-    if (profile && Object.keys(profile).length > 0) {
+    if (!loadingAuth && profile && Object.keys(profile).length > 0) {
       setFormData({
         companyName: profile.Vendor_Name,
         contactPerson: profile.First_Name + " " + profile.Last_Name,
@@ -98,7 +102,7 @@ export default function SellerProfile() {
         taxId: profile.Tax_Identification_Number,
       });
     }
-  }, [profile]);
+  }, [loadingAuth, profile]);
 
   const { showToast, overlayVisible } = useOverlayToast();
 
@@ -109,7 +113,7 @@ export default function SellerProfile() {
   const handleSave = async () => {
     try {
       const response = await axios.put(
-        `${BASE_URL}/server/b2b_backend_function/seller/${sellerId}`,
+        `${BASE_URL}/server/b2b_backend_function/seller/${contactId}`,
         {
           companyName: formData.companyName,
           contactPerson: formData.contactPerson,
@@ -126,7 +130,7 @@ export default function SellerProfile() {
           employeeCount: formData.employeeCount,
           businessLicense: formData.businessLicense,
           taxId: formData.taxId,
-          vendorAccountId: sellerAccountId,
+          vendorAccountId: accountId,
         }
       );
       if (response.data.code === "SUCCESS") {
@@ -151,7 +155,7 @@ export default function SellerProfile() {
       {overlayVisible && (
         <div className="fixed inset-0 bg-black/50 z-[50]" aria-hidden />
       )}
-      {loading ? (
+      {loading || loadingAuth ? (
         <p className="loading">Loading ....</p>
       ) : (
         <div className="space-y-6">

@@ -16,6 +16,7 @@ import ManageProducts from "./pages/seller/ManageProducts";
 import MyCertifications from "./pages/seller/MyCertifications";
 import SellerTransactions from "./pages/seller/SellerTransactions";
 import SellerProfile from "./pages/seller/SellerProfile";
+import { AccountProvider } from "./context/AccountContext";
 import NotFound from "./pages/NotFound";
 import { useEffect, useState } from "react";
 import Login from "./pages/Login";
@@ -80,149 +81,155 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <BrowserRouter>
-          <Routes>
-            {/* Redirect based on auth and user type */}
-            {!isUserAuthenticated && (
-              <>
-                <Route path="/login" element={<Login />} />
-                <Route path="*" element={<Navigate to="/login" replace />} />
-              </>
-            )}
-
-            {isUserAuthenticated &&
-              (currUser.role_details.role_name === "App User" ||
-                currUser.role_details.role_name === "Buyer") && (
+          <AccountProvider>
+            <Routes>
+              {/* Redirect based on auth and user type */}
+              {!isUserAuthenticated && (
                 <>
-                  <Route
-                    path="/"
-                    element={<Navigate to="/products" replace />}
-                  />
-                  <Route
-                    path="/app"
-                    element={<Navigate to="/products" replace />}
-                  />
-
-                  {/* Buyer Routes */}
-                  <Route
-                    path="/products"
-                    element={
-                      <BuyerLayout>
-                        <ProductSearch />
-                      </BuyerLayout>
-                    }
-                  />
-                  <Route
-                    path="/sellers"
-                    element={
-                      <BuyerLayout>
-                        <SellerSearch />
-                      </BuyerLayout>
-                    }
-                  />
-                  <Route
-                    path="/transactions"
-                    element={
-                      <BuyerLayout>
-                        <Transactions />
-                      </BuyerLayout>
-                    }
-                  />
-                  <Route
-                    path="/profile"
-                    element={
-                      <BuyerLayout>
-                        <AccountProfile />
-                      </BuyerLayout>
-                    }
-                  />
-                  <Route
-                    path="/password"
-                    element={
-                      <BuyerLayout>
-                        <ChangePassword />
-                      </BuyerLayout>
-                    }
-                  />
-
-                  <Route path="*" element={<NotFound />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="*" element={<Navigate to="/login" replace />} />
                 </>
               )}
 
-            {isUserAuthenticated &&
-              (currUser.role_details.role_name === "App Administrator" ||
-                currUser.role_details.role_name === "Seller") && (
-                <>
-                  <Route
-                    path="/"
-                    element={<Navigate to="/seller/manage-products" replace />}
-                  />
-                  <Route
-                    path="/app"
-                    element={<Navigate to="/seller/manage-products" replace />}
-                  />
+              {isUserAuthenticated &&
+                (currUser.role_details.role_name === "App User" ||
+                  currUser.role_details.role_name === "Buyer") && (
+                  <>
+                    <Route
+                      path="/"
+                      element={<Navigate to="/products" replace />}
+                    />
+                    <Route
+                      path="/app"
+                      element={<Navigate to="/products" replace />}
+                    />
 
-                  {/* Seller Routes */}
-                  <Route
-                    path="/seller/upload-products"
-                    element={
-                      <SellerLayout>
-                        <UploadProducts />
-                      </SellerLayout>
-                    }
-                  />
-                  <Route
-                    path="/seller/manage-products"
-                    element={
-                      <SellerLayout>
-                        <ManageProducts />
-                      </SellerLayout>
-                    }
-                  />
-                  <Route
-                    path="/seller/buyers"
-                    element={
-                      <SellerLayout>
-                        <BuyerSearch />
-                      </SellerLayout>
-                    }
-                  />
-                  <Route
-                    path="/seller/certifications"
-                    element={
-                      <SellerLayout>
-                        <MyCertifications />
-                      </SellerLayout>
-                    }
-                  />
-                  <Route
-                    path="/seller/transactions"
-                    element={
-                      <SellerLayout>
-                        <SellerTransactions />
-                      </SellerLayout>
-                    }
-                  />
-                  <Route
-                    path="/seller/profile"
-                    element={
-                      <SellerLayout>
-                        <SellerProfile />
-                      </SellerLayout>
-                    }
-                  />
-                  <Route
-                    path="/seller/password"
-                    element={
-                      <SellerLayout>
-                        <ChangePassword />
-                      </SellerLayout>
-                    }
-                  />
+                    {/* Buyer Routes */}
+                    <Route
+                      path="/products"
+                      element={
+                        <BuyerLayout>
+                          <ProductSearch />
+                        </BuyerLayout>
+                      }
+                    />
+                    <Route
+                      path="/sellers"
+                      element={
+                        <BuyerLayout>
+                          <SellerSearch />
+                        </BuyerLayout>
+                      }
+                    />
+                    <Route
+                      path="/transactions"
+                      element={
+                        <BuyerLayout>
+                          <Transactions />
+                        </BuyerLayout>
+                      }
+                    />
+                    <Route
+                      path="/profile"
+                      element={
+                        <BuyerLayout>
+                          <AccountProfile />
+                        </BuyerLayout>
+                      }
+                    />
+                    <Route
+                      path="/password"
+                      element={
+                        <BuyerLayout>
+                          <ChangePassword />
+                        </BuyerLayout>
+                      }
+                    />
 
-                  <Route path="*" element={<NotFound />} />
-                </>
-              )}
-          </Routes>
+                    <Route path="*" element={<NotFound />} />
+                  </>
+                )}
+
+              {isUserAuthenticated &&
+                (currUser.role_details.role_name === "App Administrator" ||
+                  currUser.role_details.role_name === "Seller") && (
+                  <>
+                    <Route
+                      path="/"
+                      element={
+                        <Navigate to="/seller/manage-products" replace />
+                      }
+                    />
+                    <Route
+                      path="/app"
+                      element={
+                        <Navigate to="/seller/manage-products" replace />
+                      }
+                    />
+
+                    {/* Seller Routes */}
+                    <Route
+                      path="/seller/upload-products"
+                      element={
+                        <SellerLayout>
+                          <UploadProducts />
+                        </SellerLayout>
+                      }
+                    />
+                    <Route
+                      path="/seller/manage-products"
+                      element={
+                        <SellerLayout>
+                          <ManageProducts />
+                        </SellerLayout>
+                      }
+                    />
+                    <Route
+                      path="/seller/buyers"
+                      element={
+                        <SellerLayout>
+                          <BuyerSearch />
+                        </SellerLayout>
+                      }
+                    />
+                    <Route
+                      path="/seller/certifications"
+                      element={
+                        <SellerLayout>
+                          <MyCertifications />
+                        </SellerLayout>
+                      }
+                    />
+                    <Route
+                      path="/seller/transactions"
+                      element={
+                        <SellerLayout>
+                          <SellerTransactions />
+                        </SellerLayout>
+                      }
+                    />
+                    <Route
+                      path="/seller/profile"
+                      element={
+                        <SellerLayout>
+                          <SellerProfile />
+                        </SellerLayout>
+                      }
+                    />
+                    <Route
+                      path="/seller/password"
+                      element={
+                        <SellerLayout>
+                          <ChangePassword />
+                        </SellerLayout>
+                      }
+                    />
+
+                    <Route path="*" element={<NotFound />} />
+                  </>
+                )}
+            </Routes>
+          </AccountProvider>
         </BrowserRouter>
       </TooltipProvider>
     </QueryClientProvider>
