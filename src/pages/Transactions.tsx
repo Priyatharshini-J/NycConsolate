@@ -147,6 +147,15 @@ export default function Transactions() {
       )}
       {loading ? (
         <p className="loading">Loading ....</p>
+      ) : deals.length === 0 ? (
+        <div className="flex flex-col items-center justify-center h-64">
+          <h2 className="text-xl font-semibold text-muted-foreground mb-2">
+            There are no deals created yet.
+          </h2>
+          <p className="text-muted-foreground">
+            Start your business journey by creating your first deal!
+          </p>
+        </div>
       ) : (
         <div className="space-y-6">
           {/* Header */}

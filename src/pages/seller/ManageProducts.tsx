@@ -285,12 +285,30 @@ export default function ManageProducts() {
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-xl font-semibold">My Products</h2>
               <p className="text-sm text-muted-foreground">
-                {products.length} products in catalog
+                {Array.isArray(products) ? products.length : 0} products in
+                catalog
               </p>
             </div>
 
+            {(!Array.isArray(products) || products.length === 0) && (
+              <Card className="text-center py-12">
+                <CardContent>
+                  <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                  <h3 className="text-lg font-semibold mb-2">
+                    No Products Yet
+                  </h3>
+                  <p className="text-muted-foreground mb-4">
+                    You haven't added any products to your catalog yet.
+                  </p>
+                  <Button asChild>
+                    <a href="/seller/upload-products">Add Your First Product</a>
+                  </Button>
+                </CardContent>
+              </Card>
+            )}
+
             <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-              {products.map((product) => (
+              {(Array.isArray(products) ? products : []).map((product) => (
                 <Card
                   key={product.id}
                   className="group hover:shadow-lg transition-all duration-300"
@@ -546,23 +564,6 @@ export default function ManageProducts() {
                 </Card>
               ))}
             </div>
-
-            {products.length === 0 && (
-              <Card className="text-center py-12">
-                <CardContent>
-                  <Package className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                  <h3 className="text-lg font-semibold mb-2">
-                    No Products Yet
-                  </h3>
-                  <p className="text-muted-foreground mb-4">
-                    You haven't added any products to your catalog yet.
-                  </p>
-                  <Button asChild>
-                    <a href="/seller/upload-products">Add Your First Product</a>
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
           </div>
         </div>
       )}

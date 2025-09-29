@@ -517,279 +517,7 @@ export default function MyCertifications() {
               </DialogContent>
             </Dialog>
           </div>
-
-          {/* Certifications List */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {certifications.map((cert) => (
-              <Card
-                key={cert.id}
-                className="hover:shadow-lg transition-all duration-300"
-              >
-                <CardHeader className="pb-4">
-                  <div className="flex items-start justify-between">
-                    <div className="flex items-start gap-3">
-                      <div className="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center bg-white">
-                        {cert.Certifical_URl ? (
-                          <a
-                            href={cert.Certifical_URl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            tabIndex={-1}
-                          >
-                            <img
-                              src={cert.Certifical_URl}
-                              alt="Certificate"
-                              className="object-cover w-full h-full rounded-lg cursor-pointer"
-                            />
-                          </a>
-                        ) : (
-                          <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-professional-teal to-professional-success flex items-center justify-center overflow-hidden">
-                            <Award className="h-6 w-6 text-white" />
-                          </div>
-                        )}
-                      </div>
-
-                      <div>
-                        <CardTitle className="text-lg line-clamp-1">
-                          {cert.Name}
-                        </CardTitle>
-                        <p className="text-sm text-muted-foreground">
-                          #{cert.Certification_number}
-                        </p>
-                      </div>
-                    </div>
-                    <Badge
-                      className={getStatusColor(getStatus(cert.Expiry_Date))}
-                    >
-                      {getStatus(cert.Expiry_Date)}
-                    </Badge>
-                  </div>
-                </CardHeader>
-
-                <CardContent className="space-y-3">
-                  <div className="space-y-2 text-sm">
-                    <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-professional-blue" />
-                      <span className="text-muted-foreground">Issuer:</span>
-                      <span className="font-medium">{cert.Issuer}</span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-professional-blue" />
-                      <span className="text-muted-foreground">Issue Date:</span>
-                      <span>
-                        {cert.Issued_Date
-                          ? format(new Date(cert.Issued_Date), "MMM dd, yyyy")
-                          : "--"}
-                      </span>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4 text-professional-blue" />
-                      <span className="text-muted-foreground">
-                        Expiry Date:
-                      </span>
-                      <span
-                        className={
-                          getStatus(cert.Expiry_Date) === "Expired"
-                            ? "text-red-600 font-medium"
-                            : ""
-                        }
-                      >
-                        {cert.Expiry_Date
-                          ? format(new Date(cert.Expiry_Date), "MMM dd, yyyy")
-                          : "--"}
-                      </span>
-                    </div>
-
-                    {getStatus(cert.Expiry_Date) === "Expiring Soon" && (
-                      <div className="flex items-center gap-2 text-yellow-600 bg-yellow-50 p-2 rounded-md">
-                        <AlertCircle className="h-4 w-4" />
-                        <span className="text-sm">Expires within 90 days</span>
-                      </div>
-                    )}
-
-                    {getStatus(cert.Expiry_Date) === "Expired" && (
-                      <div className="flex items-center gap-2 text-red-600 bg-red-50 p-2 rounded-md">
-                        <AlertCircle className="h-4 w-4" />
-                        <span className="text-sm">
-                          This certification has expired
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Actions */}
-                  <div className="flex gap-2 pt-2 border-t border-border">
-                    <Dialog
-                      open={editingCert?.id === cert.id}
-                      onOpenChange={(open) => !open && setEditingCert(null)}
-                    >
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="flex-1"
-                          onClick={() => handleEditClick(cert)}
-                        >
-                          <Edit className="h-4 w-4 mr-1" />
-                          Edit
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="max-w-2xl bg-background border border-border shadow-lg z-50">
-                        <DialogHeader>
-                          <DialogTitle>Edit Certification</DialogTitle>
-                        </DialogHeader>
-                        <div className="space-y-4">
-                          <div>
-                            <Label htmlFor="edit-cert-number">
-                              Certificate Number *
-                            </Label>
-                            <Input
-                              id="edit-cert-number"
-                              value={formData.certificateNumber}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  "certificateNumber",
-                                  e.target.value
-                                )
-                              }
-                              className={
-                                errors.certificateNumber ? "border-red-500" : ""
-                              }
-                            />
-                            {errors.certificateNumber && (
-                              <p className="text-sm text-red-500 mt-1">
-                                {errors.certificateNumber}
-                              </p>
-                            )}
-                          </div>
-
-                          <div>
-                            <Label htmlFor="edit-cert-name">
-                              Certificate Name *
-                            </Label>
-                            <Input
-                              id="edit-cert-name"
-                              value={formData.certificateName}
-                              onChange={(e) =>
-                                handleInputChange(
-                                  "certificateName",
-                                  e.target.value
-                                )
-                              }
-                              className={
-                                errors.certificateName ? "border-red-500" : ""
-                              }
-                            />
-                            {errors.certificateName && (
-                              <p className="text-sm text-red-500 mt-1">
-                                {errors.certificateName}
-                              </p>
-                            )}
-                          </div>
-
-                          <div>
-                            <Label htmlFor="edit-cert-issuer">Issuer *</Label>
-                            <Input
-                              id="edit-cert-issuer"
-                              value={formData.issuer}
-                              onChange={(e) =>
-                                handleInputChange("issuer", e.target.value)
-                              }
-                              className={errors.issuer ? "border-red-500" : ""}
-                            />
-                            {errors.issuer && (
-                              <p className="text-sm text-red-500 mt-1">
-                                {errors.issuer}
-                              </p>
-                            )}
-                          </div>
-
-                          <div className="grid grid-cols-2 gap-4">
-                            <div>
-                              <Label htmlFor="edit-issue-date">
-                                Issue Date *
-                              </Label>
-                              <Input
-                                id="edit-issue-date"
-                                type="date"
-                                value={formData.issueDate}
-                                onChange={(e) =>
-                                  handleInputChange("issueDate", e.target.value)
-                                }
-                                className={
-                                  errors.issueDate ? "border-red-500" : ""
-                                }
-                              />
-                              {errors.issueDate && (
-                                <p className="text-sm text-red-500 mt-1">
-                                  {errors.issueDate}
-                                </p>
-                              )}
-                            </div>
-
-                            <div>
-                              <Label htmlFor="edit-expiry-date">
-                                Expiry Date *
-                              </Label>
-                              <Input
-                                id="edit-expiry-date"
-                                type="date"
-                                value={formData.expiryDate}
-                                onChange={(e) =>
-                                  handleInputChange(
-                                    "expiryDate",
-                                    e.target.value
-                                  )
-                                }
-                                className={
-                                  errors.expiryDate ? "border-red-500" : ""
-                                }
-                              />
-                              {errors.expiryDate && (
-                                <p className="text-sm text-red-500 mt-1">
-                                  {errors.expiryDate}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="flex gap-2 pt-4">
-                            <Button onClick={handleUpdateCertification}>
-                              Update Certification
-                            </Button>
-                            <Button
-                              variant="outline"
-                              onClick={() => {
-                                setEditingCert(null);
-                                resetForm();
-                              }}
-                            >
-                              Cancel
-                            </Button>
-                          </div>
-                        </div>
-                      </DialogContent>
-                    </Dialog>
-
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() =>
-                        handleDeleteCertification(cert.id, cert.Name)
-                      }
-                      className="text-red-600 hover:text-red-700 hover:border-red-300"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {certifications.length === 0 && (
+          {(!Array.isArray(certifications) || certifications.length === 0) && (
             <Card className="text-center py-12">
               <CardContent>
                 <Award className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
@@ -807,6 +535,289 @@ export default function MyCertifications() {
               </CardContent>
             </Card>
           )}
+          {/* Certifications List */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {(Array.isArray(certifications) ? certifications : []).map(
+              (cert) => (
+                <Card
+                  key={cert.id}
+                  className="hover:shadow-lg transition-all duration-300"
+                >
+                  <CardHeader className="pb-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex items-start gap-3">
+                        <div className="w-12 h-12 rounded-lg overflow-hidden flex items-center justify-center bg-white">
+                          {cert.Certifical_URl ? (
+                            <a
+                              href={cert.Certifical_URl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              tabIndex={-1}
+                            >
+                              <img
+                                src={cert.Certifical_URl}
+                                alt="Certificate"
+                                className="object-cover w-full h-full rounded-lg cursor-pointer"
+                              />
+                            </a>
+                          ) : (
+                            <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-professional-teal to-professional-success flex items-center justify-center overflow-hidden">
+                              <Award className="h-6 w-6 text-white" />
+                            </div>
+                          )}
+                        </div>
+
+                        <div>
+                          <CardTitle className="text-lg line-clamp-1">
+                            {cert.Name}
+                          </CardTitle>
+                          <p className="text-sm text-muted-foreground">
+                            #{cert.Certification_number}
+                          </p>
+                        </div>
+                      </div>
+                      <Badge
+                        className={getStatusColor(getStatus(cert.Expiry_Date))}
+                      >
+                        {getStatus(cert.Expiry_Date)}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+
+                  <CardContent className="space-y-3">
+                    <div className="space-y-2 text-sm">
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4 text-professional-blue" />
+                        <span className="text-muted-foreground">Issuer:</span>
+                        <span className="font-medium">{cert.Issuer}</span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-professional-blue" />
+                        <span className="text-muted-foreground">
+                          Issue Date:
+                        </span>
+                        <span>
+                          {cert.Issued_Date
+                            ? format(new Date(cert.Issued_Date), "MMM dd, yyyy")
+                            : "--"}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        <Calendar className="h-4 w-4 text-professional-blue" />
+                        <span className="text-muted-foreground">
+                          Expiry Date:
+                        </span>
+                        <span
+                          className={
+                            getStatus(cert.Expiry_Date) === "Expired"
+                              ? "text-red-600 font-medium"
+                              : ""
+                          }
+                        >
+                          {cert.Expiry_Date
+                            ? format(new Date(cert.Expiry_Date), "MMM dd, yyyy")
+                            : "--"}
+                        </span>
+                      </div>
+
+                      {getStatus(cert.Expiry_Date) === "Expiring Soon" && (
+                        <div className="flex items-center gap-2 text-yellow-600 bg-yellow-50 p-2 rounded-md">
+                          <AlertCircle className="h-4 w-4" />
+                          <span className="text-sm">
+                            Expires within 90 days
+                          </span>
+                        </div>
+                      )}
+
+                      {getStatus(cert.Expiry_Date) === "Expired" && (
+                        <div className="flex items-center gap-2 text-red-600 bg-red-50 p-2 rounded-md">
+                          <AlertCircle className="h-4 w-4" />
+                          <span className="text-sm">
+                            This certification has expired
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex gap-2 pt-2 border-t border-border">
+                      <Dialog
+                        open={editingCert?.id === cert.id}
+                        onOpenChange={(open) => !open && setEditingCert(null)}
+                      >
+                        <DialogTrigger asChild>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="flex-1"
+                            onClick={() => handleEditClick(cert)}
+                          >
+                            <Edit className="h-4 w-4 mr-1" />
+                            Edit
+                          </Button>
+                        </DialogTrigger>
+                        <DialogContent className="max-w-2xl bg-background border border-border shadow-lg z-50">
+                          <DialogHeader>
+                            <DialogTitle>Edit Certification</DialogTitle>
+                          </DialogHeader>
+                          <div className="space-y-4">
+                            <div>
+                              <Label htmlFor="edit-cert-number">
+                                Certificate Number *
+                              </Label>
+                              <Input
+                                id="edit-cert-number"
+                                value={formData.certificateNumber}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    "certificateNumber",
+                                    e.target.value
+                                  )
+                                }
+                                className={
+                                  errors.certificateNumber
+                                    ? "border-red-500"
+                                    : ""
+                                }
+                              />
+                              {errors.certificateNumber && (
+                                <p className="text-sm text-red-500 mt-1">
+                                  {errors.certificateNumber}
+                                </p>
+                              )}
+                            </div>
+
+                            <div>
+                              <Label htmlFor="edit-cert-name">
+                                Certificate Name *
+                              </Label>
+                              <Input
+                                id="edit-cert-name"
+                                value={formData.certificateName}
+                                onChange={(e) =>
+                                  handleInputChange(
+                                    "certificateName",
+                                    e.target.value
+                                  )
+                                }
+                                className={
+                                  errors.certificateName ? "border-red-500" : ""
+                                }
+                              />
+                              {errors.certificateName && (
+                                <p className="text-sm text-red-500 mt-1">
+                                  {errors.certificateName}
+                                </p>
+                              )}
+                            </div>
+
+                            <div>
+                              <Label htmlFor="edit-cert-issuer">Issuer *</Label>
+                              <Input
+                                id="edit-cert-issuer"
+                                value={formData.issuer}
+                                onChange={(e) =>
+                                  handleInputChange("issuer", e.target.value)
+                                }
+                                className={
+                                  errors.issuer ? "border-red-500" : ""
+                                }
+                              />
+                              {errors.issuer && (
+                                <p className="text-sm text-red-500 mt-1">
+                                  {errors.issuer}
+                                </p>
+                              )}
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-4">
+                              <div>
+                                <Label htmlFor="edit-issue-date">
+                                  Issue Date *
+                                </Label>
+                                <Input
+                                  id="edit-issue-date"
+                                  type="date"
+                                  value={formData.issueDate}
+                                  onChange={(e) =>
+                                    handleInputChange(
+                                      "issueDate",
+                                      e.target.value
+                                    )
+                                  }
+                                  className={
+                                    errors.issueDate ? "border-red-500" : ""
+                                  }
+                                />
+                                {errors.issueDate && (
+                                  <p className="text-sm text-red-500 mt-1">
+                                    {errors.issueDate}
+                                  </p>
+                                )}
+                              </div>
+
+                              <div>
+                                <Label htmlFor="edit-expiry-date">
+                                  Expiry Date *
+                                </Label>
+                                <Input
+                                  id="edit-expiry-date"
+                                  type="date"
+                                  value={formData.expiryDate}
+                                  onChange={(e) =>
+                                    handleInputChange(
+                                      "expiryDate",
+                                      e.target.value
+                                    )
+                                  }
+                                  className={
+                                    errors.expiryDate ? "border-red-500" : ""
+                                  }
+                                />
+                                {errors.expiryDate && (
+                                  <p className="text-sm text-red-500 mt-1">
+                                    {errors.expiryDate}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+
+                            <div className="flex gap-2 pt-4">
+                              <Button onClick={handleUpdateCertification}>
+                                Update Certification
+                              </Button>
+                              <Button
+                                variant="outline"
+                                onClick={() => {
+                                  setEditingCert(null);
+                                  resetForm();
+                                }}
+                              >
+                                Cancel
+                              </Button>
+                            </div>
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() =>
+                          handleDeleteCertification(cert.id, cert.Name)
+                        }
+                        className="text-red-600 hover:text-red-700 hover:border-red-300"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              )
+            )}
+          </div>
         </div>
       )}
     </>

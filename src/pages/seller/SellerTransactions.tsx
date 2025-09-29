@@ -171,25 +171,35 @@ export default function SellerTransactions() {
     }
   };
 
-  const filteredDeals = deals.filter((deal) => {
-    if (filter === "all") return true;
-    return deal.Stage === filter;
-  });
+  const filteredDeals =
+    Array.isArray(deals) && deals.length > 0
+      ? deals.filter((deal) => {
+          if (filter === "all") return true;
+          return deal.Stage === filter;
+        })
+      : [];
 
   const [quantities, setQuantities] = useState(() =>
     Object.fromEntries(filteredDeals.map((d) => [d.id, d.Quantity]))
   );
 
   const stats = {
-    total: deals.length,
-    contacted: deals.filter((d) => d.Stage === "Seller Contacted").length,
-    negotiation:
-      Number(deals.filter((d) => d.Stage === "Negotiating Terms").length) +
-      Number(deals.filter((d) => d.Stage === "Agreement Reached").length),
-    won: deals.filter((d) => d.Stage === "Closed Won").length,
-    lost: deals.filter((d) => d.Stage === "Closed Lost").length,
+    total: Array.isArray(deals) ? deals.length : 0,
+    contacted: Array.isArray(deals)
+      ? deals.filter((d) => d.Stage === "Seller Contacted").length
+      : 0,
+    negotiation: Array.isArray(deals)
+      ? Number(deals.filter((d) => d.Stage === "Negotiating Terms").length) +
+        Number(deals.filter((d) => d.Stage === "Agreement Reached").length)
+      : 0,
+    won: Array.isArray(deals)
+      ? deals.filter((d) => d.Stage === "Closed Won").length
+      : 0,
+    lost: Array.isArray(deals)
+      ? deals.filter((d) => d.Stage === "Closed Lost").length
+      : 0,
     winRate:
-      deals.length > 0
+      Array.isArray(deals) && deals.length > 0
         ? Math.round(
             (deals.filter((d) => d.Stage === "Closed Won").length /
               deals.length) *
@@ -199,10 +209,13 @@ export default function SellerTransactions() {
   };
 
   const [editingId, setEditingId] = useState(null);
+
   useEffect(() => {
-    // Sync quantities only if the deals list itself changes significantly,
-    // or if you want to reset quantities on some deliberate action.
-    setQuantities(Object.fromEntries(deals.map((d) => [d.id, d.Quantity])));
+    if (Array.isArray(deals) && deals.length > 0) {
+      setQuantities(Object.fromEntries(deals.map((d) => [d.id, d.Quantity])));
+    } else {
+      setQuantities({});
+    }
   }, [deals]);
 
   const handleQuantityChange = (id, newValue) => {
@@ -375,9 +388,24 @@ export default function SellerTransactions() {
             </span>
           </div>
 
+          {(!Array.isArray(filteredDeals) || filteredDeals.length === 0) && (
+            <Card className="text-center py-12">
+              <CardContent>
+                <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">
+                  {filter === "all" ? "No Deals Yet" : `No ${filter} Deals`}
+                </h3>
+                <p className="text-muted-foreground">
+                  {filter === "all"
+                    ? "Buyer contact requests will appear here once they discover your products."
+                    : `You don't have any deals in ${filter} stage currently.`}
+                </p>
+              </CardContent>
+            </Card>
+          )}
           {/* Deals List */}
           <div className="space-y-4">
-            {filteredDeals.map((deal) => (
+            {(Array.isArray(filteredDeals) ? filteredDeals : []).map((deal) => (
               <Card key={deal.id} className="hover:shadow-md transition-shadow">
                 <CardHeader className="pb-3">
                   <div className="flex items-start justify-between">
@@ -556,22 +584,6 @@ export default function SellerTransactions() {
               </Card>
             ))}
           </div>
-
-          {filteredDeals.length === 0 && (
-            <Card className="text-center py-12">
-              <CardContent>
-                <MessageCircle className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold mb-2">
-                  {filter === "all" ? "No Deals Yet" : `No ${filter} Deals`}
-                </h3>
-                <p className="text-muted-foreground">
-                  {filter === "all"
-                    ? "Buyer contact requests will appear here once they discover your products."
-                    : `You don't have any deals in ${filter} stage currently.`}
-                </p>
-              </CardContent>
-            </Card>
-          )}
         </div>
       )}
     </>
