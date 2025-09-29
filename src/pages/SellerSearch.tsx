@@ -68,11 +68,11 @@ export default function SellerSearch() {
       }
     } catch (error) {
       console.error("Error in Creating a product deal:", error);
+      showToast({
+        title: "Contact Request Failed",
+        description: `Your contact request has failed. Try again after sometime.`,
+      });
     }
-    showToast({
-      title: "Contact Request Sent",
-      description: `Your contact request has been sent to ${sellerName}. A deal record has been created in your transactions.`,
-    });
   };
 
   const handleSearch = async (filterName, value) => {

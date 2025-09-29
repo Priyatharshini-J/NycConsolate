@@ -540,7 +540,7 @@ app.get("/getVendors", async (req, res) => {
 			Mobile: row.Mobile,
 			Vendor_Name: row["Vendor_Account.Vendor_Name"],
 			Business_Description: row["Vendor_Account.Business_Description"],
-			vendorAccountId: row["Vendor_Account.id"],
+			id: row["Vendor_Account.id"],
 			Average_Rating: row["Vendor_Account.Average_Rating"],
 			Rating_Count: row["Vendor_Account.Rating_Count"],
 			State: row["Vendor_Account.State"],
