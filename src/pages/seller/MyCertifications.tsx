@@ -29,8 +29,8 @@ import {
   BASE_URL,
   CERTIFICATES_BUCKET_NAME,
   CERTIFICATES_BUCKET_URL,
-  sellerAccountId,
 } from "../../constants";
+import { useAccount } from "../../context/AccountContext";
 
 interface Certification {
   id: string;
@@ -43,6 +43,7 @@ interface Certification {
 }
 
 export default function MyCertifications() {
+  const { accountId, contactId, loadingAuth } = useAccount();
   const [certifications, setCertifications] = useState<Certification[]>([]);
   const [reloadCertsFlag, setReloadCertsFlag] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -64,7 +65,7 @@ export default function MyCertifications() {
     setLoading(true);
     try {
       const res = await axios.get(
-        `${BASE_URL}/server/b2b_backend_function/getSellerCertifications/${sellerAccountId}`
+        `${BASE_URL}/server/b2b_backend_function/getSellerCertifications/${accountId}`
       );
       setCertifications(res.data);
     } catch (err) {
@@ -74,8 +75,10 @@ export default function MyCertifications() {
     }
   };
   useEffect(() => {
-    fetchCertificates();
-  }, [reloadCertsFlag]);
+    if (!loadingAuth && accountId) {
+      fetchCertificates();
+    }
+  }, [reloadCertsFlag, loadingAuth, accountId]);
 
   const [editingCert, setEditingCert] = useState<Certification | null>(null);
   const [isAddingNew, setIsAddingNew] = useState(false);
@@ -176,7 +179,7 @@ export default function MyCertifications() {
     try {
       // Send product data to backend to store in ZOHO CRM Product's module
       const response = await axios.post(
-        `${BASE_URL}/server/b2b_backend_function/postSellerCertifications/${sellerAccountId}`,
+        `${BASE_URL}/server/b2b_backend_function/postSellerCertifications/${accountId}`,
         {
           certificationNo: formData.certificateNumber,
           name: formData.certificateName,
@@ -340,7 +343,7 @@ export default function MyCertifications() {
       {overlayVisible && (
         <div className="fixed inset-0 bg-black/50 z-[50]" aria-hidden />
       )}
-      {loading ? (
+      {loading || loadingAuth ? (
         <p className="loading">Loading ....</p>
       ) : (
         <div className="space-y-6">

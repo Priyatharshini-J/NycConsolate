@@ -21,8 +21,8 @@ import {
   Clock,
 } from "lucide-react";
 import axios from "axios";
-import { BASE_URL, buyerAccountId } from "../constants";
-
+import { BASE_URL } from "../constants";
+import { useAccount } from "../context/AccountContext";
 interface Deal {
   id: string;
   Deal_Name: string;
@@ -35,6 +35,7 @@ interface Deal {
 }
 
 export default function Transactions() {
+  const { accountId, loadingAuth } = useAccount();
   const [feedbackModal, setFeedbackModal] = useState<string | null>(null);
   const [feedback, setFeedback] = useState("");
   const [rating, setRating] = useState(0);
@@ -43,21 +44,22 @@ export default function Transactions() {
   const { showToast, overlayVisible } = useOverlayToast();
 
   useEffect(() => {
-    const fetchSellers = async () => {
-      try {
-        const res = await axios.get(
-          `${BASE_URL}/server/b2b_backend_function/getBuyerDeals/${buyerAccountId}`
-        );
-        setDeals(res.data);
-      } catch (err) {
-        console.error("Failed to fetch order", err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchSellers();
-  }, []);
+    if (!loadingAuth && accountId) {
+      const fetchSellers = async () => {
+        try {
+          const res = await axios.get(
+            `${BASE_URL}/server/b2b_backend_function/getBuyerDeals/${accountId}`
+          );
+          setDeals(res.data);
+        } catch (err) {
+          console.error("Failed to fetch order", err);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchSellers();
+    }
+  }, [accountId, loadingAuth]);
 
   const getStageIcon = (stage: Deal["Stage"]) => {
     switch (stage) {

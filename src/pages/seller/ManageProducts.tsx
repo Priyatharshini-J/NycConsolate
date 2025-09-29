@@ -24,7 +24,8 @@ import { useOverlayToast } from "@/hooks/use-overlay-toast";
 import { Edit, Trash2, Eye, Package, ImagePlus } from "lucide-react";
 import { cn } from "@/lib/utils";
 import axios from "axios";
-import { BASE_URL, sellerAccountId } from "../../constants";
+import { BASE_URL } from "../../constants";
+import { useAccount } from "../../context/AccountContext";
 
 interface Product {
   id: string;
@@ -39,6 +40,7 @@ interface Product {
 }
 
 export default function ManageProducts() {
+  const { accountId, contactId, loadingAuth } = useAccount();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -51,21 +53,23 @@ export default function ManageProducts() {
   };
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const res = await axios.get(
-          `${BASE_URL}/server/b2b_backend_function/getSellerProducts/${sellerAccountId}`
-        );
-        setProducts(res.data);
-      } catch (err) {
-        console.error("Failed to fetch Products", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (!loadingAuth && accountId) {
+      const fetchProducts = async () => {
+        try {
+          const res = await axios.get(
+            `${BASE_URL}/server/b2b_backend_function/getSellerProducts/${accountId}`
+          );
+          setProducts(res.data);
+        } catch (err) {
+          console.error("Failed to fetch Products", err);
+        } finally {
+          setLoading(false);
+        }
+      };
 
-    fetchProducts();
-  }, []);
+      fetchProducts();
+    }
+  }, [loadingAuth, accountId]);
 
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [editForm, setEditForm] = useState({
@@ -244,7 +248,7 @@ export default function ManageProducts() {
       {overlayVisible && (
         <div className="fixed inset-0 bg-black/50 z-[50]" aria-hidden />
       )}
-      {loading ? (
+      {loading || loadingAuth ? (
         <p className="loading">Loading ....</p>
       ) : (
         <div className="space-y-6">
