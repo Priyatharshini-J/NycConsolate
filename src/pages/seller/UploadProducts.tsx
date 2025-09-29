@@ -102,10 +102,6 @@ export default function UploadProducts() {
       newErrors.category = "Product category is required";
     }
 
-    if (!formData.tax) {
-      newErrors.category = "Tax is required";
-    }
-
     if (!formData.minPrice) {
       newErrors.priceRange = "Minimum price is required";
     }
@@ -120,10 +116,6 @@ export default function UploadProducts() {
 
     if (!formData.hsCode) {
       newErrors.priceRange = "HS code is required";
-    }
-
-    if (formData.tax.length === 0) {
-      newErrors.priceRange = "Select at least one tax slab.";
     }
 
     if (!formData.minOrderQuantity.trim()) {
@@ -179,7 +171,6 @@ export default function UploadProducts() {
           minOrderQuantity: formData.minOrderQuantity,
           hsCode: formData.hsCode,
           itcHsCode: formData.itcHsCode,
-          tax: formData.tax,
           fileUrl: fileUrl,
           vendorId: accountId,
         }

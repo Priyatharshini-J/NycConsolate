@@ -38,7 +38,7 @@ app.post("/inviteUser", async (req, res) => {
 			template_details: {
 				senders_mail: 'priyatharshini.ja+solutions@zohotest.com',
 				subject: 'Welcome to the Indian Consulate NYC Trade Platform',
-				message: '<p>Hello %FIRST_NAME% %LAST_NAME%,</p> <p>You have been invited to join NYC Trade Platform team. You can access the app from this link:</p> <p><a href=' % LINK % '>%LINK%</a></p> <p>You are assigned to the role %ROLE_NAME% in this app.</p> <p>If you didn’t ask to join the application or if you think this was a mistake, you can ignore this email.</p> <p>Thanks,</p> <p></p> <p>Indian Consulate</p>'
+				message: '<p>Hello %FIRST_NAME% %LAST_NAME%,</p> <p>You have been invited to join NYC Trade Platform team. You can access the app from this link:</p> <p><a href=\'%LINK%\'>%LINK%</a></p> <p>You are assigned to the role %ROLE_NAME% in this app.</p> <p>If you didn’t ask to join the application or if you think this was a mistake, you can ignore this email.</p> <p>Thanks,</p> <p></p> <p>Indian Consulate</p>'
 			},
 			redirect_url: 'https://icnycconsulate.onslate.com'
 		};
@@ -49,7 +49,7 @@ app.post("/inviteUser", async (req, res) => {
 			email_id: Email,
 			role_id: roleId
 		};
-
+		console.log("userConfig - ", userConfig);
 		let userManagement = catalystApp.userManagement();
 		await userManagement.registerUser(signupConfig, userConfig);
 
@@ -80,12 +80,14 @@ app.post("/inviteUser", async (req, res) => {
 		);
 
 		const rawData = response.data.data[0];
+		console.log("rawData - ", rawData);
 		const ContactId = rawData.id;
 		const AccountId = rawData[account].id;
 		await catalystApp.datastore().table('IdMapping').insertRow({ Email, ContactId, AccountId });
 		res.status(200).json("User added successfully !!!");
 	} catch (err) {
 		console.log("Error in inviting user >>> " + JSON.stringify(err));
+		console.log("Error in inviting user >>> " + err);
 		res.status(500).send({
 			message: "Internal Server Error. Please try again after sometime.",
 			error: err
@@ -976,7 +978,7 @@ app.put("/deal/:id", async (req, res) => {
 app.post("/postProduct", async (req, res) => {
 	try {
 		const catalystApp = catalyst.initialize(req);
-		const { productName, description, category, minPrice, maxPrice, minOrderQuantity, fileUrl, vendorId, hsCode, itcHsCode, tax } = req.body;
+		const { productName, description, category, minPrice, maxPrice, minOrderQuantity, fileUrl, vendorId, hsCode, itcHsCode } = req.body;
 		const payload = {
 			"data": [
 				{
